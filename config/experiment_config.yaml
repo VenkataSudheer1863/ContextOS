@@ -1,0 +1,190 @@
+##############################################################################
+# ContextOS Experiment Configuration
+# ---------------------------------------------------------------------------
+# Central configuration for benchmark experiments, statistical tests, and
+# ablation studies.  All paths are relative to the repository root.
+##############################################################################
+
+experiment:
+  # ---- Methods under evaluation ----
+  methods:
+    - full_context       # Naive: pass entire history within the context window
+    - truncation         # Simple tail-truncation baseline
+    - rag_only           # Retrieval-augmented generation without scheduling
+    - memgpt             # MemGPT (Packer et al., 2023) — paged memory
+    - raptor             # RAPTOR (Sarthi et al., 2024) — recursive summarisation
+    - contextos          # Our system: full ContextOS pipeline
+
+  # ---- Context lengths (tokens) ----
+  context_lengths:
+    - 512
+    - 2048
+    - 8192
+    - 32768
+
+  # ---- Language models ----
+  models:
+    - gpt-oss-20b        # Open-source 20B instruction-tuned model
+    - qwen3              # Qwen3 (Alibaba Cloud)
+    - glm-4.5            # GLM-4.5 (Zhipu AI)
+
+  # ---- Sampling ----
+  num_samples: 500
+  random_seed: 42
+
+  # ---- Output ----
+  output_dir: results/
+  save_raw_results: true
+  save_plots: true
+  dry_run: false
+  resume: false
+  timeout_seconds: 0.0
+
+  # ---- Evaluation datasets ----
+  datasets:
+    - longbench          # Long-document benchmark (Wang et al., 2023)
+    - musique            # Multi-hop reasoning (Trivedi et al., 2022)
+    - narrativeqa        # Long-context narrative QA (Kocisky et al., 2018)
+    - hotpotqa           # Multi-hop open-domain QA (Yang et al., 2018)
+
+  # ---- Primary evaluation metrics ----
+  metrics:
+    - task_completion_rate   # Fraction of tasks completed correctly (0–1)
+    - retrieval_precision    # Precision@K for context retrieval (0–1)
+    - context_utilization    # Fraction of token budget used meaningfully (0–1)
+    - latency_ms             # Wall-clock inference latency in milliseconds
+
+
+##############################################################################
+# Statistical Testing
+##############################################################################
+
+statistical_tests:
+  # Significance level for all hypothesis tests
+  alpha: 0.05
+
+  # Multiple-comparison correction method
+  # Options: none | bonferroni | holm | benjamini_hochberg
+  correction: bonferroni
+
+  # Primary hypothesis tests to run
+  tests:
+    - paired_t_test          # Parametric; requires approximately normal differences
+    - wilcoxon               # Non-parametric signed-rank test
+
+  # Confidence interval settings
+  confidence_level: 0.95
+
+  # Bootstrap parameters (for bootstrap CIs, when enabled)
+  bootstrap:
+    n_iterations: 10000
+    method: bca              # bias-corrected and accelerated
+
+  # Comparisons of interest (each is ContextOS vs. the named baseline)
+  primary_comparisons:
+    - rag_only               # Expected p < 0.001 across all context lengths
+    - memgpt                 # Expected p < 0.01 for 8K and 32K contexts
+    - raptor                 # Expected p < 0.05 for long contexts
+    - truncation             # Expected p < 0.001 across all context lengths
+    - full_context           # Expected p < 0.05 for long contexts
+
+
+##############################################################################
+# Ablation Study
+##############################################################################
+
+ablation:
+  # System components to individually disable
+  components:
+    - scheduling             # Priority-based context scheduling
+    - compression            # Multi-strategy context compression
+    - governance             # Retention / forgetting / promotion policies
+    - prioritization         # Multi-signal relevance scoring
+    - long_term_memory       # Episodic + semantic + procedural storage
+
+  # Additional multi-component ablations
+  compound_ablations:
+    - [governance, long_term_memory]     # Memory management subsystem
+    - [scheduling, prioritization]       # Selection subsystem
+    - [compression, governance]          # Space management subsystem
+
+  # Metrics reported for each ablation variant
+  ablation_metrics:
+    - task_completion_rate
+    - retrieval_precision
+    - context_utilization
+
+  # Interaction analysis
+  compute_interactions: true
+
+  # Number of evaluation samples per ablation configuration
+  ablation_samples: 500
+
+
+##############################################################################
+# Scheduling Hyperparameters
+##############################################################################
+
+scheduler:
+  algorithm: greedy          # greedy | diversity | threshold
+  weights:
+    relevance:  0.40
+    recency:    0.25
+    importance: 0.20
+    novelty:    0.15
+  decay_lambda: 0.0001       # Temporal decay rate for recency scoring
+  mmr_lambda:   0.60         # MMR lambda for DiversityScheduler
+  threshold:    0.40         # Priority threshold for ThresholdScheduler
+
+
+##############################################################################
+# Compression Settings
+##############################################################################
+
+compression:
+  default_ratio:    0.40     # Target compression ratio (compressed / original)
+  minimum_quality:  0.25     # Minimum quality floor
+  abstractive:      false    # Disable LLM-based abstractive compression in eval
+  progressive_step: 0.10     # Step size for ProgressiveCompressor
+
+
+##############################################################################
+# Governance Settings
+##############################################################################
+
+governance:
+  forgetting_threshold:  0.10   # Importance below which items are forgotten
+  promotion_threshold:   0.70   # Importance above which items are promoted
+  compression_trigger:   0.80   # Token budget fraction that triggers compression
+  retention_hours:       72.0   # Maximum idle time (hours) before eviction
+  lru_capacity:          1000   # Maximum items in long-term episodic store
+  retention_mode:        any    # any | all (CompositeRetention logic)
+
+
+##############################################################################
+# Observability
+##############################################################################
+
+observability:
+  mlflow_uri:      http://localhost:5000
+  experiment_name: contextos_benchmark
+  run_tags:
+    version:     "1.0"
+    environment: research
+
+  logging:
+    level:   INFO
+    format:  "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    file:    results/experiment.log
+
+
+##############################################################################
+# Reproducibility
+##############################################################################
+
+reproducibility:
+  random_seed:          42
+  torch_deterministic:  true
+  numpy_seed:           42
+  pin_model_versions:   true
+  record_system_info:   true   # CPU, RAM, GPU, Python version saved to results/

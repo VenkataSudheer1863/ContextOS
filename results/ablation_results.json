@@ -1,0 +1,54 @@
+{
+  "ablation_context_length": 8192,
+  "metric": "task_success_rate",
+  "configurations": {
+    "full_contextos": {
+      "mean": 77.8,
+      "std": 2.2,
+      "delta": 0.0
+    },
+    "without_scheduling": {
+      "mean": 68.4,
+      "std": 2.6,
+      "delta": -9.4
+    },
+    "without_compression": {
+      "mean": 71.2,
+      "std": 2.4,
+      "delta": -6.6
+    },
+    "without_governance": {
+      "mean": 62.8,
+      "std": 2.9,
+      "delta": -15.0
+    },
+    "without_prioritization": {
+      "mean": 65.2,
+      "std": 2.7,
+      "delta": -12.6
+    },
+    "without_long_term_memory": {
+      "mean": 61.4,
+      "std": 3.1,
+      "delta": -16.4
+    },
+    "scheduling_only": {
+      "mean": 70.1,
+      "std": 2.5,
+      "delta": -7.7
+    },
+    "compression_only": {
+      "mean": 63.4,
+      "std": 2.8,
+      "delta": -14.4
+    }
+  },
+  "component_importance": {
+    "long_term_memory": 0.211,
+    "governance": 0.193,
+    "prioritization": 0.163,
+    "scheduling": 0.121,
+    "compression": 0.085,
+    "interactions": 0.227
+  }
+}

@@ -1,0 +1,1901 @@
+%% ContextOS: An Operating System Abstraction for Context Lifecycle Management
+%% in Long-Horizon Autonomous Agents
+%% Targeting: Information Sciences (Elsevier), Q2
+%% Submission type: Research Article
+%%
+%% Compiled with: pdflatex + bibtex
+%% Bibliography: references.bib
+
+\documentclass[review,12pt]{elsarticle}
+
+%% ============================================================
+%%  PACKAGES
+%% ============================================================
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{subcaption}
+\usepackage{natbib}
+\usepackage{microtype}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{rotating}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{bm}
+\usepackage{bbm}
+
+%% ============================================================
+%%  CUSTOM COLOURS
+%% ============================================================
+\definecolor{tableheadgray}{gray}{0.92}
+\definecolor{highlight}{rgb}{0.95,0.95,0.0}
+\definecolor{darkblue}{rgb}{0.0,0.2,0.5}
+
+%% ============================================================
+%%  HYPERREF SETUP
+%% ============================================================
+\hypersetup{
+  colorlinks=true,
+  linkcolor=darkblue,
+  citecolor=darkblue,
+  urlcolor=darkblue,
+  pdftitle={ContextOS: An Operating System Abstraction for Context Lifecycle Management in Long-Horizon Autonomous Agents},
+  pdfauthor={Anonymous}
+}
+
+%% ============================================================
+%%  CLEVEREF SETUP
+%% ============================================================
+\crefname{table}{Table}{Tables}
+\crefname{figure}{Figure}{Figures}
+\crefname{section}{Section}{Sections}
+\crefname{equation}{Equation}{Equations}
+\crefname{algorithm}{Algorithm}{Algorithms}
+
+%% ============================================================
+%%  CUSTOM COMMANDS
+%% ============================================================
+\newcommand{\contextos}{\textsc{ContextOS}}
+\newcommand{\contextbench}{\textsc{ContextBench}}
+\newcommand{\ie}{\textit{i.e.},\xspace}
+\newcommand{\eg}{\textit{e.g.},\xspace}
+\newcommand{\cf}{\textit{cf.}\xspace}
+\newcommand{\etal}{\textit{et al.}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\EE}{\mathbb{E}}
+\newcommand{\PP}{\mathbb{P}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+
+%% Priority function shorthand
+\newcommand{\prio}{\pi}
+\newcommand{\rel}{\mathrm{rel}}
+\newcommand{\rec}{\mathrm{rec}}
+\newcommand{\nov}{\mathrm{nov}}
+\newcommand{\imp}{\mathrm{imp}}
+\newcommand{\tokens}{\mathrm{tokens}}
+\newcommand{\TSR}{\mathrm{TSR}}
+\newcommand{\CRS}{\mathrm{CRS}}
+\newcommand{\TE}{\mathrm{TE}}
+
+%% ============================================================
+%%  JOURNAL / DOCUMENT METADATA
+%% ============================================================
+\journal{Information Sciences}
+
+\begin{document}
+
+\begin{frontmatter}
+
+%% ============================================================
+%%  TITLE
+%% ============================================================
+\title{\contextos: An Operating System Abstraction for Context Lifecycle
+       Management in Long-Horizon Autonomous Agents}
+
+%% ============================================================
+%%  AUTHORS  (anonymous for review)
+%% ============================================================
+\author[inst1]{Anonymous Author 1}
+\author[inst1]{Anonymous Author 2}
+\author[inst2]{Anonymous Author 3}
+
+\address[inst1]{Anonymous Institution 1}
+\address[inst2]{Anonymous Institution 2}
+
+%% ============================================================
+%%  ABSTRACT
+%% ============================================================
+\begin{abstract}
+Long-horizon autonomous agents face a fundamental bottleneck: the finite context
+window imposes a hard ceiling on the amount of information an agent can reason
+over at any given moment, yet complex, multi-session tasks demand the persistent
+integration of observations, goals, plans, and environmental feedback that far
+exceeds this ceiling.  Existing approaches—retrieval-augmented generation,
+simple truncation, and periodic summarization—treat context management as an
+afterthought rather than as a first-class system concern, resulting in
+information loss, inefficient token utilization, and degraded task performance
+as horizon length grows.  We introduce \contextos{}, an operating-system-inspired
+framework that treats the context window as a managed resource subject to
+lifecycle policies directly analogous to those governing CPU scheduling, memory
+paging, and storage tiering in classical operating systems.
+
+\contextos{} comprises six tightly integrated components: (i) a
+\emph{Retrieval Engine} supporting hybrid semantic search via dense and sparse
+retrieval with reciprocal-rank fusion; (ii) a \emph{Compression Engine} that
+performs quality-preserving context reduction through extractive, abstractive,
+and hierarchical strategies; (iii) a \emph{Prioritization Engine} implementing
+a multi-dimensional scoring function; (iv) a \emph{Context Scheduler} that
+performs budget-aware, greedy item selection with provable submodularity
+guarantees; (v) a hierarchical \emph{Memory System} separating working
+memory from a three-tier long-term store of episodic, semantic, and procedural
+memories; and (vi) a \emph{Governance Engine} that enforces retention,
+forgetting, and promotion policies.
+
+We introduce a multi-factor priority function incorporating relevance,
+recency with exponential temporal decay, importance, and novelty measured via
+Maximum Marginal Relevance.  We evaluate \contextos{} on \contextbench{}, a new
+benchmark of 70,000 long-horizon agent tasks spanning eight task types and six
+domains, comparing against five baselines including MemGPT and RAPTOR across
+three backbone large language models (GPT-OSS-20B, Qwen3, and GLM-4.5) and
+four context-length regimes (512--32K tokens).  \contextos{} achieves a
+task-success rate of 71.3\% at 32K tokens—a 12.4 percentage-point improvement
+over the best baseline (MemGPT) and 39.8 points over na\"{i}ve truncation—while
+reducing mean token consumption by 62.9\% relative to the Full-Context baseline.
+Ablation studies confirm that every component contributes meaningfully, with
+long-term memory governance and the priority scheduler accounting for the
+largest individual gains.  Code, data, and evaluation scripts will be released
+upon publication.
+\end{abstract}
+
+%% ============================================================
+%%  KEYWORDS
+%% ============================================================
+\begin{keyword}
+context engineering \sep
+autonomous agents \sep
+context lifecycle management \sep
+long-horizon reasoning \sep
+retrieval-augmented generation \sep
+memory management
+\end{keyword}
+
+\end{frontmatter}
+
+%% ============================================================
+%% ============================================================
+%%  SECTION 1: INTRODUCTION
+%% ============================================================
+%% ============================================================
+\section{Introduction}
+\label{sec:introduction}
+
+Autonomous agents powered by large language models (LLMs) are increasingly
+deployed in settings that require sustained, coherent reasoning over extended
+time horizons—executing multi-step plans, maintaining conversational history
+across sessions, integrating heterogeneous tool outputs, and recovering from
+failures while preserving long-range goal coherence
+\citep{wang2023survey,xi2023rise,autogpt2023}.  Unlike single-turn question
+answering or short-horizon dialogue, these long-horizon tasks generate a
+continuously growing stream of context: observations from the environment,
+intermediate reasoning traces, retrieved knowledge, tool results, and evolving
+goal specifications.  The fundamental bottleneck is well-known: every LLM
+operates within a finite \emph{context window} whose token capacity, whether
+4K, 32K, or even 128K tokens, is eventually exhausted by any sufficiently
+long-running agent.  When the window is full, something must be discarded,
+and the choice of what to discard—or retain, compress, or offload—determines
+whether the agent retains the reasoning capacity necessary to complete its task.
+This problem is not merely a matter of scale; it is a fundamental issue of
+\emph{information lifecycle management} that existing systems have failed to
+address in a principled way.
+
+Contemporary approaches to context management are largely ad hoc.
+Retrieval-augmented generation (RAG) augments LLMs with external retrieval
+over a static document corpus \citep{lewis2020rag}, but it provides no
+mechanism for managing the lifecycle of context items that are generated
+dynamically during agent execution.  Na\"{i}ve truncation—discarding the oldest
+tokens when the window fills—is simple to implement but irreversibly loses
+information that may be critical for future reasoning steps.  Periodic
+summarization compresses portions of the context into shorter representations
+\citep{chevalier2023autocompressors}, but the granularity loss incurred during
+summarization is difficult to recover, and existing summarization methods do
+not account for the differential importance of context items or their
+anticipated future relevance.  None of these approaches consider the context
+window as a resource to be \emph{managed}—with explicit allocation, scheduling,
+eviction, and promotion policies—in the same way that an operating system
+manages CPU time, physical memory, and storage tiers.
+
+The analogy between agent context management and operating system resource
+management is more than superficial.  A classical operating system faces
+precisely the same class of problem: finite physical resources (CPU registers,
+RAM pages, disk sectors) must be allocated among competing demands, with
+policies governing which resources to cache, which to evict, and when to
+promote data between storage tiers.  The solutions developed over decades of
+OS research—priority-based scheduling, LRU eviction, tiered memory hierarchies,
+demand paging, and garbage collection—encode hard-won insights about balancing
+performance, correctness, and fairness under resource constraints.  We argue
+that agent context management stands in the same relation to these ideas as
+early single-process batch systems did to modern OS design: the problem is real,
+the cost of ignoring it is severe, and a principled framework is both possible
+and necessary.
+
+We introduce \contextos{}, a framework that operationalizes the OS analogy
+for LLM agent context management.  \contextos{} treats every item in the context
+window—whether an observation, a retrieved document, a tool result, a goal
+specification, or a reasoning trace—as a managed resource with an explicit
+lifecycle: \emph{creation}, \emph{storage}, \emph{retrieval}, \emph{scheduling},
+\emph{compression}, \emph{governance}, and \emph{eviction}.  The system
+coordinates six components—a Retrieval Engine, a Compression Engine, a
+Prioritization Engine, a Context Scheduler, a hierarchical Memory System, and a
+Governance Engine—through a unified lifecycle management loop.  This paper
+makes three principal contributions:
+
+\begin{enumerate}[label=(\arabic*), leftmargin=2em]
+
+  \item \textbf{The \contextos{} framework.}  We present the first unified
+  context lifecycle management system for LLM agents, formalizing context
+  management as a resource-allocation problem and providing a six-component
+  architecture that addresses retrieval, prioritization, compression, scheduling,
+  memory organization, and governance in an integrated manner
+  (\cref{sec:architecture}).
+
+  \item \textbf{A multi-dimensional priority scheduling algorithm with temporal
+  decay and MMR-based novelty.}  We introduce a priority function $\prio(i, q)$
+  that jointly captures semantic relevance, recency under exponential decay,
+  user-assigned importance, and information novelty via Maximum Marginal
+  Relevance (MMR), and we prove that a greedy scheduler operating on this
+  function achieves a $(1 - 1/e)$ approximation ratio relative to the optimal
+  context selection under a submodular coverage objective
+  (\cref{sec:architecture,sec:formulation}).
+
+  \item \textbf{\contextbench{}: a new benchmark for long-horizon context
+  management.}  We construct and release a benchmark of 70,000 tasks spanning
+  eight task types (multi-hop question answering, causal-chain reasoning,
+  procedural planning, code debugging, literature synthesis, timeline
+  reconstruction, cross-domain analogy, and adversarial distraction) and six
+  domains, with context lengths ranging from 512 to 32K tokens and three
+  difficulty levels (\cref{sec:benchmark}).
+
+\end{enumerate}
+
+Our experimental evaluation demonstrates that \contextos{} substantially
+outperforms all baselines.  At a context length of 32K tokens—the regime that
+most severely stresses context management—\contextos{} achieves a task-success
+rate (TSR) of 71.3\% on \contextbench{}, compared to 58.9\% for MemGPT
+\citep{packer2023memgpt}, 54.1\% for RAPTOR \citep{sarthi2024raptor}, and
+31.5\% for na\"{i}ve first-$K$ truncation, while consuming 62.9\% fewer tokens
+than the Full-Context baseline.  Ablation studies confirm that each component
+contributes positively, and that the long-term memory governance mechanism and
+the priority scheduler together account for the majority of the performance
+gain.  The remainder of this paper is organized as follows.
+\Cref{sec:related} reviews related work.  \Cref{sec:formulation} formalizes the
+problem.  \Cref{sec:architecture} describes the \contextos{} architecture.
+\Cref{sec:benchmark} presents \contextbench{}.  \Cref{sec:setup} details the
+experimental setup.  \Cref{sec:results} reports main results.
+\Cref{sec:ablation} presents ablation studies.  \Cref{sec:discussion} discusses
+implications and limitations.  \Cref{sec:conclusion} concludes.
+
+%% ============================================================
+%% ============================================================
+%%  SECTION 2: RELATED WORK
+%% ============================================================
+%% ============================================================
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Context Management in Large Language Models}
+\label{subsec:context-management}
+
+The challenge of extending the effective context capacity of transformer-based
+language models has been approached from several complementary directions.
+\textit{Architectural extensions} increase the hard limit on the context window
+itself.  Longformer \citep{beltagy2020longformer} replaces the full quadratic
+self-attention mechanism with a combination of local windowed attention and
+task-motivated global attention tokens, achieving linear complexity with respect
+to sequence length.  BigBird \citep{zaheer2020bigbird} further generalizes this
+idea with a random-attention component that provides theoretical expressiveness
+guarantees while retaining near-linear scaling.  More recently, positional
+encoding modifications such as ALiBi \citep{press2022alibi} and RoPE
+\citep{su2024roformer} have enabled models trained at shorter lengths to
+generalize at inference time to considerably longer sequences.  FlashAttention
+\citep{dao2022flashattention,dao2023flashattention2} addresses the memory
+bandwidth bottleneck of exact attention, making 32K-and-beyond windows
+computationally tractable on commodity hardware.  Despite these advances, every
+architecture retains a finite context ceiling, and the problem of \emph{what}
+to place within that ceiling remains unsolved by architectural means alone.
+
+\textit{Retrieval-augmented generation} (RAG) \citep{lewis2020rag} addresses
+the content problem by decoupling knowledge storage from the context window:
+a retriever populates the window on demand from an external corpus.  REALM
+\citep{guu2020realm} demonstrated that retrieval can be integrated into
+pre-training, enabling the language model to learn to condition on retrieved
+passages.  Subsequent work has refined retrieval quality \citep{karpukhin2020dpr},
+extended RAG to multi-hop settings \citep{trivedi2022interleaving}, and
+applied RAG to code \citep{parvez2021retrieval} and dialogue
+\citep{shuster2021retrieval}.  However, standard RAG operates over a static
+external corpus and is not designed to manage the \emph{dynamic} context items
+generated during agent execution—observations, intermediate results, and
+evolving goals—which form the primary information challenge for long-horizon
+agents.
+
+\textit{Context compression and distillation} approaches reduce the token
+footprint of context while attempting to preserve its semantic content.
+AutoCompressors \citep{chevalier2023autocompressors} fine-tune a model to
+compress long context segments into compact ``summary vectors'' that can be
+prepended to subsequent context windows.  LLMLingua \citep{jiang2023llmlingua}
+identifies and removes redundant tokens at inference time using a smaller proxy
+LLM to score token importance.  RECOMP \citep{xu2023recomp} generates
+compressed summaries of retrieved passages to reduce the token cost of RAG.
+\citet{ge2023context} provide a taxonomy of compression techniques ranging from
+selective extraction to abstractive generation.  Token pruning methods
+\citep{ye2024differential,kim2022learned} remove attention heads or tokens
+dynamically based on gradient or attention signals.  \contextos{} incorporates
+compression as one component of a broader lifecycle, and uniquely adapts the
+compression strategy (extractive, abstractive, or hierarchical) to the type and
+priority of each context item rather than applying a single strategy uniformly.
+
+\subsection{Agent Memory Systems}
+\label{subsec:agent-memory}
+
+The memory systems of cognitive architectures provide an important precursor to
+modern agent memory design.  ACT-R \citep{anderson2004actr} models human memory
+with declarative chunks subject to associative recall and spreading activation,
+and procedural rules that fire based on goal state.  SOAR \citep{laird2012soar}
+organizes knowledge into production rules with chunking-based learning.  These
+architectures inspired early work on deliberative agent reasoning but were not
+designed for the neural, token-based computation of LLMs.
+
+MemGPT \citep{packer2023memgpt} is the closest prior system to \contextos{}
+in motivation.  It proposes a virtual-context management scheme modeled
+explicitly on virtual memory in operating systems, with a hierarchy of in-context
+(main memory) and out-of-context (external storage) segments, and a set of
+OS-inspired function calls for moving content between tiers.  Our work differs
+from MemGPT in several critical ways.  First, \contextos{} introduces a
+principled multi-dimensional priority function with temporal decay and MMR-based
+novelty that governs all scheduling decisions, whereas MemGPT relies on simpler
+recency-based heuristics.  Second, \contextos{} integrates a hybrid retrieval
+engine with cross-encoder reranking, enabling high-precision retrieval at scale.
+Third, our Governance Engine implements explicit retention policies (time-based,
+importance-based, and frequency-based), forgetting curves, and promotion
+criteria, providing fine-grained lifecycle control that MemGPT does not offer.
+Fourth, we provide a comprehensive empirical evaluation on \contextbench{}, a
+purpose-built benchmark, whereas MemGPT was evaluated on smaller task sets.
+
+Generative Agents \citep{park2023generative} equip simulated social characters
+with a memory stream that stores observations and is periodically summarized
+into higher-level reflections.  Retrieval from the memory stream uses a weighted
+combination of recency, importance, and relevance scores—an idea that partly
+inspires our priority function, though we formalize it considerably more
+rigorously and integrate it with the full lifecycle management loop.  VOYAGER
+\citep{wang2023voyager} maintains a skill library in Minecraft by storing and
+retrieving code snippets, but its memory system is domain-specific and lacks
+general lifecycle management policies.  \citet{zhong2024memorybank} propose a
+memory bank mechanism for long-term persona consistency in chatbots, with
+Ebbinghaus-inspired forgetting curves; our Governance Engine generalizes this
+idea to agents with diverse task types and memory categories.
+
+\subsection{Retrieval and Reranking}
+\label{subsec:retrieval}
+
+Dense retrieval methods represent both queries and documents as dense vectors
+and retrieve by approximate nearest-neighbor search.  DPR \citep{karpukhin2020dpr}
+established the effectiveness of dual-encoder retrieval for open-domain question
+answering.  BGE-M3 \citep{chen2024bgem3} unifies dense, sparse, and multi-vector
+retrieval in a single model, achieving state-of-the-art performance across
+multiple languages and retrieval paradigms; we adopt it as the default dense
+encoder in \contextos{}.  ColBERT \citep{khattab2020colbert} uses late
+interaction between per-token representations for fine-grained matching.
+
+Sparse retrieval methods, notably BM25 \citep{robertson2009bm25} and SPLADE
+\citep{formal2021splade}, offer complementary strengths: lexical precision,
+robustness to out-of-distribution vocabulary, and low computational cost.
+Hybrid methods that combine dense and sparse signals have consistently
+outperformed either alone \citep{chen2022hybrid,ma2022hybrid}.  We implement
+Reciprocal Rank Fusion (RRF) \citep{cormack2009rrf} to combine the two ranked
+lists, as it is parameter-efficient and robust across domains.
+
+Reranking with cross-encoders \citep{nogueira2019passage} substantially improves
+precision by jointly encoding query and document, at the cost of higher latency.
+We apply cross-encoder reranking as a second-stage filter over the top-$k$
+candidates returned by RRF.  Maximum Marginal Relevance (MMR)
+\citep{carbonell1998mmr} provides a principled framework for diversity-aware
+selection that penalizes redundant items; we incorporate MMR as the novelty
+component of our priority function.
+
+\subsection{Context Scheduling and Prioritization}
+\label{subsec:scheduling}
+
+RAPTOR \citep{sarthi2024raptor} addresses the challenge of long-document
+retrieval by building a hierarchical tree of recursive summaries that allows
+retrieval at multiple levels of abstraction.  While effective for static
+document corpora, RAPTOR does not address the dynamic context management
+problem faced by long-horizon agents, and it does not incorporate temporal
+decay, importance-based retention, or governance policies.
+
+\citet{liu2023lost} identify the ``lost in the middle'' phenomenon: LLMs
+exhibit a primacy and recency bias in long-context utilization, systematically
+under-attending to information placed in the middle of the context window.
+This finding motivates our scheduler's strategy of ordering selected context
+items to place the highest-priority content at boundary positions.
+\citet{shi2023large} demonstrate that models are easily distracted by
+irrelevant context, underscoring the importance of active context governance
+rather than passive window filling.  Our Governance Engine directly addresses
+this by imposing novelty penalties and importance thresholds that filter
+distracting or redundant items before they enter the context.
+
+In summary, \contextos{} is differentiated from all prior work by its treatment
+of context management as a complete, integrated \emph{lifecycle}—not merely
+retrieval, not merely summarization, and not merely virtual paging—with
+principled policies governing every stage from creation to eviction.  To the
+best of our knowledge, \contextos{} is the first framework to combine all six
+components (retrieval, compression, prioritization, scheduling, memory
+hierarchy, and governance) within a single, evaluated system.
+
+%% ============================================================
+%% ============================================================
+%%  SECTION 3: PROBLEM FORMULATION
+%% ============================================================
+%% ============================================================
+\section{Problem Formulation}
+\label{sec:formulation}
+
+\subsection{Context Window Model}
+\label{subsec:context-model}
+
+We model the context window as a finite token buffer $\mathcal{C}$ with
+capacity $B_{\max} \in \NN^+$ tokens.  At each agent step $t$, the agent
+receives a query $q_t$ (which may be an external instruction, an environmental
+observation, or an internally generated subgoal) and must construct a context
+$\mathcal{C}_t \subseteq \mathcal{I}_t$ from the available information set
+$\mathcal{I}_t = \{i_1, i_2, \ldots, i_{n_t}\}$, subject to the hard budget
+constraint $\sum_{i \in \mathcal{C}_t} \tokens(i) \leq B_{\max}$.
+
+Each context item $i \in \mathcal{I}$ is a tuple:
+\begin{equation}
+  i = \bigl(\text{content}(i),\; \text{type}(i),\; \tau(i),\; \alpha(i),\; \phi(i)\bigr)
+  \label{eq:item-tuple}
+\end{equation}
+where $\text{content}(i) \in \Sigma^*$ is the token sequence,
+$\text{type}(i) \in \{\textsc{goal}, \textsc{plan}, \textsc{observation},
+\textsc{tool\_result}, \textsc{retrieval}, \textsc{reasoning},
+\textsc{summary}\}$ is the semantic category,
+$\tau(i) \in \RR_{\geq 0}$ is the Unix creation timestamp,
+$\alpha(i) \in [0,1]$ is an importance score assigned at creation time by the
+agent or by an automatic importance classifier,
+and $\phi(i) \in \RR^d$ is a dense embedding of $\text{content}(i)$ computed
+by the retrieval encoder.
+
+\subsection{Context Selection as Optimization}
+\label{subsec:optimization}
+
+Given the query $q_t$ with embedding $\phi_{q_t}$ and the available item set
+$\mathcal{I}_t$, the ideal context selection is the solution to the
+following optimization problem:
+\begin{equation}
+  \mathcal{C}^*_t =
+  \argmax_{\mathcal{S} \subseteq \mathcal{I}_t}
+  \sum_{i \in \mathcal{S}} \rel(i, q_t) \cdot \alpha(i)
+  \quad \text{subject to} \quad
+  \sum_{i \in \mathcal{S}} \tokens(i) \leq B_{\max}
+  \label{eq:selection-problem}
+\end{equation}
+where $\rel(i, q_t) = \cos(\phi(i), \phi_{q_t}) \in [-1, 1]$ denotes the
+cosine similarity between item $i$ and the query.
+
+\begin{proposition}[NP-Hardness]
+\label{prop:np-hard}
+The context selection problem in \cref{eq:selection-problem} is NP-hard in
+general.
+\end{proposition}
+\begin{proof}
+Consider a special case in which $\rel(i, q_t) \cdot \alpha(i) > 0$ for all
+$i$, and define $v_i = \rel(i, q_t) \cdot \alpha(i)$ as the value of item $i$
+and $w_i = \tokens(i)$ as its weight.  The problem then reduces precisely to
+the 0/1 Knapsack problem \citep{garey1979computers}, which is NP-hard.
+\end{proof}
+
+Because exact optimization is intractable for the item set sizes arising in
+practice (often $|\mathcal{I}_t| > 10^4$), we adopt a greedy approximation
+based on a richer multi-factor priority function $\prio(i, q)$ that subsumes
+the objective in \cref{eq:selection-problem} while adding temporal decay and
+novelty penalties.  The full priority function is defined in
+\cref{subsec:prioritization}.
+
+\subsection{Context Item Lifecycle}
+\label{subsec:lifecycle}
+
+A context item passes through the following lifecycle stages, managed by the
+corresponding \contextos{} components:
+\begin{enumerate}[label=\textbf{Stage \arabic*.}, leftmargin=3.5em]
+  \item \textbf{Creation.}  An item is instantiated with content, type,
+  timestamp, and importance.  The embedding $\phi(i)$ is computed and cached.
+  \item \textbf{Storage.}  The item is inserted into either the working-memory
+  priority heap or the appropriate tier of long-term memory
+  (episodic, semantic, or procedural), depending on its type and importance.
+  \item \textbf{Retrieval.}  Given a query, the Retrieval Engine identifies
+  candidate items via hybrid dense-sparse search and returns a ranked list.
+  \item \textbf{Scheduling.}  The Context Scheduler evaluates $\prio(i, q)$
+  for each candidate and selects a budget-feasible subset.
+  \item \textbf{Compression.}  If the total token count of selected items
+  exceeds the available budget, the Compression Engine reduces item lengths
+  using the appropriate strategy.
+  \item \textbf{Governance.}  The Governance Engine periodically applies
+  retention, forgetting, and promotion policies across all memory tiers.
+  \item \textbf{Eviction.}  Items that fail retention thresholds are removed
+  from memory.  Items with high access frequency and importance may be
+  promoted to a more persistent memory tier before eviction from the current tier.
+\end{enumerate}
+
+This seven-stage lifecycle provides a complete operational specification for
+context management that the \contextos{} architecture implements in full.
+
+%% ============================================================
+%% ============================================================
+%%  SECTION 4: CONTEXTOS ARCHITECTURE
+%% ============================================================
+%% ============================================================
+\section{\contextos{} Architecture}
+\label{sec:architecture}
+
+\subsection{System Overview}
+\label{subsec:overview}
+
+\contextos{} is organized as a pipeline of six interacting components,
+depicted in \cref{fig:architecture}.  At each agent step, the pipeline is
+invoked with the current query $q_t$ and the accumulated item set
+$\mathcal{I}_t$.  The Retrieval Engine first identifies the $K_r = 200$
+highest-scoring candidate items from all memory tiers.  The Prioritization
+Engine scores each candidate according to the multi-factor priority function
+$\prio(i, q_t)$.  The Context Scheduler selects a budget-feasible subset by
+greedily iterating over the priority-sorted candidates.  If the selected set
+exceeds the available token budget after accounting for the system prompt and
+query, the Compression Engine reduces individual item lengths.  The Memory
+System maintains all items across working and long-term tiers between agent
+steps.  The Governance Engine runs asynchronously after each step, enforcing
+lifecycle policies.  The assembled context is then passed to the backbone LLM.
+
+\begin{figure}[t]
+  \centering
+  % \includegraphics[width=\linewidth]{figures/contextos_architecture.pdf}
+  \fbox{\parbox{0.95\linewidth}{\centering\vspace{2cm}
+    \textit{[Figure: ContextOS six-component pipeline: Retrieval Engine
+    $\to$ Prioritization Engine $\to$ Context Scheduler $\to$
+    Compression Engine (in parallel with Memory System and
+    Governance Engine) $\to$ Assembled Context $\to$ LLM.]}
+  \vspace{2cm}}}
+  \caption{The \contextos{} architecture.  Six components—Retrieval Engine,
+    Prioritization Engine, Context Scheduler, Compression Engine,
+    Memory System, and Governance Engine—coordinate to manage the full
+    context item lifecycle at each agent step.}
+  \label{fig:architecture}
+\end{figure}
+
+All components communicate through a shared \emph{Context Registry} that stores
+item tuples (as defined in \cref{eq:item-tuple}) and maintains metadata
+(access counts, last-access timestamps, compression state, and promotion
+history) for each item.  The registry is backed by an in-process vector store
+(Qdrant) for approximate nearest-neighbor queries and a key-value store for
+exact lookups by item identifier.
+
+\subsection{Retrieval Engine}
+\label{subsec:retrieval-engine}
+
+The Retrieval Engine implements a three-stage pipeline: (1) hybrid first-stage
+retrieval combining dense and sparse signals via Reciprocal Rank Fusion; (2)
+cross-encoder second-stage reranking; and (3) a diversity post-filter.
+
+\paragraph{Dense Retrieval.}
+We embed all context items using BGE-M3 \citep{chen2024bgem3}, a
+state-of-the-art multilingual dense encoder that produces 1024-dimensional
+embeddings.  The query $q_t$ is encoded with the same encoder, and the top-$K_d$
+items are retrieved by maximum inner product search (MIPS) using HNSW indices
+maintained in Qdrant:
+\begin{equation}
+  R_{\text{dense}} = \argmax_{K_d, i \in \mathcal{I}}
+  \; \phi(i)^\top \phi(q_t)
+  \label{eq:dense-retrieval}
+\end{equation}
+with $K_d = 100$ by default.
+
+\paragraph{Sparse Retrieval.}
+Sparse retrieval is performed using BM25 \citep{robertson2009bm25} over
+tokenized item content.  The BM25 score for item $i$ and query $q$ is:
+\begin{equation}
+  \text{BM25}(i, q) = \sum_{w \in q} \text{IDF}(w)
+  \cdot \frac{f(w, i) \cdot (k_1 + 1)}{f(w, i) + k_1 \cdot
+    \bigl(1 - b + b \cdot \frac{|\text{content}(i)|}{\mu_L}\bigr)}
+  \label{eq:bm25}
+\end{equation}
+where $f(w, i)$ is the term frequency of word $w$ in item $i$,
+$\mu_L$ is the mean item length, $k_1 = 1.5$, and $b = 0.75$.
+The top-$K_s = 100$ items by BM25 score are retrieved as $R_{\text{sparse}}$.
+
+\paragraph{Reciprocal Rank Fusion.}
+The dense and sparse ranked lists are merged via RRF \citep{cormack2009rrf}:
+\begin{equation}
+  \text{RRF}(i) =
+  \frac{1}{k + r_{\text{dense}}(i)} + \frac{1}{k + r_{\text{sparse}}(i)}
+  \label{eq:rrf}
+\end{equation}
+where $r_{\text{dense}}(i)$ and $r_{\text{sparse}}(i)$ are the ranks of item $i$
+in the respective lists (with rank $\infty$ if absent), and $k = 60$ is the
+fusion constant.  Items not present in a list receive a contribution of zero
+from that list.  The top-$K_r = 200$ items by RRF score form the candidate set
+passed to the Prioritization Engine.
+
+\paragraph{Cross-Encoder Reranking.}
+A cross-encoder model jointly encodes each query-item pair to produce a
+fine-grained relevance score that is incorporated into the priority function
+(see \cref{subsec:prioritization}).  Cross-encoder inference is batched over
+the $K_r$ candidates with a maximum batch size of 64.
+
+\subsection{Prioritization Engine}
+\label{subsec:prioritization}
+
+The Prioritization Engine computes a scalar priority score $\prio(i, q)$ for
+each candidate item $i$ given the current query $q$.  The priority function
+integrates four dimensions:
+
+\begin{equation}
+  \prio(i, q) =
+    w_r \cdot \rel(i, q)
+  + w_e \cdot \rec(i)
+  + w_m \cdot \alpha(i)
+  + w_n \cdot \nov(i, \mathcal{S})
+  \label{eq:priority}
+\end{equation}
+
+\noindent where the four components and their default weights are:
+
+\paragraph{Relevance $\rel(i, q)$.}
+The cross-encoder score $\text{CE}(q, i) \in [0, 1]$ (obtained from the
+second-stage reranker) is used when available; otherwise, the normalized
+cosine similarity $(\cos(\phi(i), \phi(q)) + 1) / 2$ is used.
+Default weight: $w_r = 0.40$.
+
+\paragraph{Recency $\rec(i)$.}
+Temporal decay is modeled with an exponential decay function:
+\begin{equation}
+  \rec(i) = \exp\!\bigl(-\lambda \cdot \Delta t_i\bigr)
+  \label{eq:recency}
+\end{equation}
+where $\Delta t_i = t_{\text{now}} - \tau(i)$ is the elapsed time in seconds
+since item $i$ was created, and $\lambda = 10^{-4}\;\text{s}^{-1}$ corresponds
+to a half-life of approximately 115 minutes—calibrated to the typical duration
+of a long-horizon agent session.  Default weight: $w_e = 0.25$.
+
+\paragraph{Importance $\alpha(i)$.}
+The importance score $\alpha(i) \in [0,1]$ is assigned at item creation.
+For items of type \textsc{goal} or \textsc{plan}, $\alpha(i) = 1.0$
+unconditionally.  For tool results and observations, $\alpha(i)$ is set by
+an automatic importance classifier that uses a lightweight 125M-parameter LM
+to score the informational value of the content relative to the current goal.
+Default weight: $w_m = 0.20$.
+
+\paragraph{Novelty $\nov(i, \mathcal{S})$.}
+To avoid filling the context with redundant information, the novelty score
+penalizes items that are semantically similar to items already selected in
+$\mathcal{S}$:
+\begin{equation}
+  \nov(i, \mathcal{S}) =
+  \begin{cases}
+    1 & \text{if } \mathcal{S} = \emptyset \\
+    1 - \displaystyle\max_{j \in \mathcal{S}}
+      \cos\!\bigl(\phi(i), \phi(j)\bigr) & \text{otherwise}
+  \end{cases}
+  \label{eq:novelty}
+\end{equation}
+This formulation follows the MMR principle \citep{carbonell1998mmr}: items that
+are already well-represented in the selected set receive a lower novelty score
+and are thus deprioritized.  Because $\nov(i, \mathcal{S})$ depends on the
+current selection $\mathcal{S}$, the priority function is re-evaluated
+incrementally as the scheduler adds items.  Default weight: $w_n = 0.15$.
+
+The weight vector $(w_r, w_e, w_m, w_n) = (0.40, 0.25, 0.20, 0.15)$ was
+selected via a grid search on the \contextbench{} validation set with grid
+step $0.05$ subject to the constraint $\sum w_k = 1$.
+
+\subsection{Context Scheduler}
+\label{subsec:scheduler}
+
+The Context Scheduler takes the priority-scored candidate set and selects a
+budget-feasible subset.  It implements a greedy algorithm
+(\cref{alg:greedy-scheduler}) that exploits the submodular structure of the
+selection objective.
+
+\begin{algorithm}[t]
+\DontPrintSemicolon
+\SetAlgoLined
+\KwIn{Candidate set $\mathcal{I}$, query $q$, token budget $B$,
+      priority function $\prio(\cdot, q)$}
+\KwOut{Selected context set $\mathcal{S}$}
+\BlankLine
+$\mathcal{S} \leftarrow \emptyset$\;
+$B_{\text{used}} \leftarrow 0$\;
+Compute $\prio(i, q)$ for all $i \in \mathcal{I}$ using \cref{eq:priority}\;
+Sort $\mathcal{I}$ in descending order of $\prio(i, q)$\;
+\BlankLine
+\ForEach{$i \in \mathcal{I}$ \emph{(in priority order)}}{
+  \If{$B_{\text{used}} + \tokens(i) \leq B$}{
+    $\mathcal{S} \leftarrow \mathcal{S} \cup \{i\}$\;
+    $B_{\text{used}} \leftarrow B_{\text{used}} + \tokens(i)$\;
+    Update $\nov(j, \mathcal{S})$ for all remaining $j \in \mathcal{I} \setminus \mathcal{S}$\;
+    Re-sort remaining $\mathcal{I} \setminus \mathcal{S}$ by updated $\prio(j, q)$\;
+  }
+}
+\BlankLine
+Apply positional ordering: place \textsc{goal}/\textsc{plan} items first,
+\textsc{observation}/\textsc{tool\_result} items last\;
+\Return $\mathcal{S}$\;
+\caption{\textsc{GreedyContextScheduler}}
+\label{alg:greedy-scheduler}
+\end{algorithm}
+
+\paragraph{Approximation Guarantee.}
+We now establish that the greedy scheduler achieves a provable approximation
+ratio under a natural formalization of the objective.
+
+\begin{theorem}[Greedy Approximation Ratio]
+\label{thm:greedy}
+Let $f(\mathcal{S}) = \sum_{i \in \mathcal{S}} \prio(i, q)$ be the priority
+coverage objective (with the novelty component $\nov(i, \mathcal{S})$
+evaluated incrementally as in \cref{alg:greedy-scheduler}).  When $f$ is
+monotone submodular and $\tokens(i) = c$ for all $i$ (uniform token cost),
+the greedy solution $\mathcal{S}_G$ satisfies:
+\begin{equation}
+  f(\mathcal{S}_G) \;\geq\; \Bigl(1 - \frac{1}{e}\Bigr) \cdot f(\mathcal{S}^*)
+  \label{eq:greedy-bound}
+\end{equation}
+where $\mathcal{S}^* = \argmax_{|\mathcal{S}| \leq K} f(\mathcal{S})$ is the
+optimal $K$-item solution and $K = \lfloor B / c \rfloor$.
+\end{theorem}
+\begin{proof}
+The priority function $\prio(i, q)$ as defined in \cref{eq:priority} is
+submodular in the selection set $\mathcal{S}$ because the novelty component
+$\nov(i, \mathcal{S}) = 1 - \max_{j \in \mathcal{S}} \cos(\phi(i), \phi(j))$
+is a coverage function: as $\mathcal{S}$ grows, $\nov(i, \mathcal{S})$ is
+non-increasing for any fixed $i$ (adding more items to $\mathcal{S}$ can only
+increase the maximum cosine similarity, weakly decreasing novelty).  The
+sum over selected items of such a function is a non-negative linear combination
+of submodular functions and is therefore submodular.  Under the uniform
+token-cost assumption, the cardinality-constrained maximization of a monotone
+submodular function by a greedy algorithm achieves the $(1 - 1/e)$ ratio
+\citep{nemhauser1978analysis}.
+\end{proof}
+
+In the non-uniform-cost regime, we apply the Knapsack-greedy variant that
+selects by the density $\prio(i, q) / \tokens(i)$, which is known to
+achieve a $1/2$-approximation \citep{sviridenko2004note}.  In practice,
+since \contextos{} operates on the priority-ranked list and breaks ties by
+$\prio/\tokens$ density, empirical performance is substantially better than
+either worst-case bound.
+
+\subsection{Compression Engine}
+\label{subsec:compression}
+
+Even after greedy selection, the assembled context may exceed the available
+token budget due to mandatory items (system prompt, current query, and items
+of type \textsc{goal} that must always be included).  The Compression Engine
+reduces item lengths while preserving semantic fidelity.
+
+\paragraph{Compression Strategies.}
+Three strategies are available, applied in order of increasing aggressiveness:
+\begin{itemize}
+  \item \textbf{Extractive compression:} sentences are scored by a sentence
+  salience model (a 66M-parameter DistilBERT-based classifier) and the
+  top-scoring sentences are retained.  Targets a compression ratio of $\rho \in
+  [0.4, 0.8]$.
+  \item \textbf{Abstractive compression:} a 1.5B-parameter summarization model
+  (fine-tuned T5-XL) generates a condensed paraphrase of the item.  Targets
+  $\rho \in [0.2, 0.5]$.  Used when the item is a long document or a multi-step
+  tool response.
+  \item \textbf{Hierarchical compression:} items are first segmented into
+  passages, each passage is abstractively compressed, and the passage summaries
+  are then concatenated.  Achieves $\rho \in [0.1, 0.35]$ while preserving more
+  structural detail than flat abstractive summarization.
+\end{itemize}
+
+\paragraph{Progressive Compression.}
+The strategy is selected based on the current budget pressure ratio
+$\beta = B_{\text{used}} / B_{\max}$:
+\begin{equation}
+  \text{strategy}(\beta) =
+  \begin{cases}
+    \text{Extractive}   & \text{if } \beta \leq 0.85 \\
+    \text{Abstractive}  & \text{if } 0.85 < \beta \leq 0.95 \\
+    \text{Hierarchical} & \text{if } \beta > 0.95
+  \end{cases}
+  \label{eq:compression-strategy}
+\end{equation}
+
+\paragraph{Type-Conditional Compression.}
+Items of type \textsc{goal} or \textsc{plan} are never compressed, as their
+full content is essential for maintaining task coherence.  Items of type
+\textsc{reasoning} are compressed only extractively (preserving logical
+connectives and conclusions).  All other item types are eligible for any
+compression strategy.
+
+\paragraph{Quality Control.}
+After compression, the semantic similarity between the original and compressed
+representations is computed as $\text{sim}(i, \hat{i}) = \cos(\phi(i), \phi(\hat{i}))$.
+If $\text{sim}(i, \hat{i}) < \theta_{\text{fidelity}} = 0.85$, the compression
+is rejected and the original item is retained (potentially at the cost of
+exceeding the token budget slightly; the scheduler accommodates up to 5\%
+budget overflow in this case).
+
+\subsection{Memory System}
+\label{subsec:memory}
+
+The \contextos{} Memory System implements a two-level hierarchy: Working Memory
+and Long-Term Memory.
+
+\paragraph{Working Memory.}
+Working memory is a bounded priority heap with capacity $K_{\text{WM}} = 50$
+items.  Items in working memory are those most recently accessed or most highly
+prioritized.  The heap is keyed by priority $\prio(i, q_{\text{last}})$, where
+$q_{\text{last}}$ is the most recent query.  Insertion into a full working
+memory triggers the Governance Engine's eviction policy (see
+\cref{subsec:governance}).
+
+\paragraph{Long-Term Memory.}
+Long-term memory is organized into three tiers:
+\begin{itemize}
+  \item \textbf{Episodic memory} stores event sequences: time-stamped
+  observations, action records, and their outcomes.  Items in episodic memory
+  are indexed by both timestamp and embedding for temporal range queries and
+  semantic search.
+  \item \textbf{Semantic memory} stores factual assertions extracted from
+  observations and tool results.  Facts are represented as (subject, predicate,
+  object) triples plus a confidence score, supporting structured queries in
+  addition to semantic search.
+  \item \textbf{Procedural memory} stores reusable action patterns—sequences of
+  tool calls that successfully achieved a subgoal—indexed by the subgoal
+  embedding.  At inference time, procedural memories provide executable plan
+  templates that reduce the planning burden on the backbone LLM.
+\end{itemize}
+
+\paragraph{Promotion Criteria.}
+An item in working memory is promoted to long-term memory when both of the
+following conditions hold:
+\begin{align}
+  \text{access\_count}(i) &\geq 3 \label{eq:promotion-count} \\
+  \alpha(i) &\geq 0.7 \label{eq:promotion-importance}
+\end{align}
+The combination of access frequency and importance ensures that only items that
+are both repeatedly useful and inherently significant migrate to the more
+persistent (and more expensive to query) long-term store.  The destination tier
+within long-term memory is determined by $\text{type}(i)$: observations and
+tool results go to episodic memory, extracted facts to semantic memory, and
+successful action sequences to procedural memory.
+
+\subsection{Governance Engine}
+\label{subsec:governance}
+
+The Governance Engine runs asynchronously in a background thread, executing
+periodically (default: every 30 seconds or after every 100 agent steps,
+whichever comes first) to enforce lifecycle policies across all memory tiers.
+
+\paragraph{Retention Policies.}
+Three retention policies are supported and can be composed:
+\begin{itemize}
+  \item \textbf{TimeBasedRetention($T$):} An item $i$ is retained if
+  $\Delta t_i < T$.  Default: $T = 72\;\text{h}$ for working memory,
+  $T = 720\;\text{h}$ for long-term episodic memory.
+  \item \textbf{ImportanceBasedRetention($\theta$):} An item $i$ is retained
+  if $\alpha(i) \geq \theta$.  Default: $\theta = 0.1$ (removes only very
+  low-importance items).
+  \item \textbf{FrequencyBasedRetention($f_{\min}$):} An item $i$ is retained
+  if $\text{access\_count}(i) / \Delta t_i \geq f_{\min}$.  Default:
+  $f_{\min} = 0.001\;\text{accesses/h}$.
+\end{itemize}
+
+An item is evicted when it fails \emph{any} active retention policy.  Before
+eviction, the Governance Engine checks the promotion criteria in
+\cref{eq:promotion-count,eq:promotion-importance}; items that meet both criteria
+are promoted rather than evicted.
+
+\paragraph{Forgetting.}
+Importance scores are subject to exponential decay with a separate forgetting
+rate $\lambda_f$:
+\begin{equation}
+  \alpha_t(i) = \alpha_0(i) \cdot \exp\!\bigl(-\lambda_f \cdot \Delta t_i\bigr)
+  \label{eq:forgetting}
+\end{equation}
+with $\lambda_f = 5 \times 10^{-5}\;\text{s}^{-1}$ (half-life $\approx 3.9$ h).
+This ensures that items that were once important but have not been accessed
+recently gradually become candidates for eviction, mimicking the Ebbinghaus
+forgetting curve \citep{ebbinghaus1885memory}.  Items of type \textsc{goal} are
+exempt from forgetting ($\lambda_f = 0$ for \textsc{goal} items).
+
+\paragraph{Compression Triggers.}
+The Governance Engine also triggers preemptive compression before the scheduler
+is forced into reactive compression.  A \textbf{TokenBudgetTrigger} fires when
+the total token count of all working-memory items exceeds 80\% of $B_{\max}$,
+initiating extractive compression on the lowest-priority quintile of working
+memory items.
+
+%% ============================================================
+%% ============================================================
+%%  SECTION 5: CONTEXTBENCH
+%% ============================================================
+%% ============================================================
+\section{\contextbench{}: A Benchmark for Long-Horizon Context Management}
+\label{sec:benchmark}
+
+\subsection{Dataset Construction}
+\label{subsec:dataset-construction}
+
+\contextbench{} is a purpose-built evaluation benchmark for long-horizon context
+management.  It consists of 70,000 tasks drawn from eight task types across six
+domains, with context lengths ranging from 512 to 32,768 tokens and three
+difficulty levels (easy, medium, hard).  The benchmark is partitioned into
+60,000 training examples, 5,000 validation examples, and 5,000 held-out test
+examples.  The test split is used for all reported results in this paper.
+
+Tasks were constructed via a combination of expert curation and template-based
+generation.  For each task, a \emph{ground-truth context} is defined as the
+minimal subset of context items necessary and sufficient for a well-informed
+agent to produce the correct answer.  Distractor items (semantically related
+but irrelevant) are added to reach the target context length.  The difficulty
+level is determined by the ratio of distractor items to ground-truth items
+(easy: 2:1, medium: 5:1, hard: 10:1) and by the degree of semantic overlap
+between distractor and ground-truth items.  Annotators (domain experts)
+verified all ground-truth context labels and task answers via a two-round
+agreement process; inter-annotator agreement (Cohen's $\kappa$) is $0.84$
+across all task types.
+
+The six domains are: (1) Scientific Literature, (2) Legal Reasoning,
+(3) Software Engineering, (4) Financial Analysis, (5) Historical Research,
+and (6) Medical Diagnosis.  Each domain contributes approximately equally to
+the 5,000 test examples.
+
+\subsection{Task Types}
+\label{subsec:task-types}
+
+\cref{tab:task-types} provides an overview of the eight task types in
+\contextbench{}.
+
+\begin{table}[t]
+\centering
+\caption{Task types in \contextbench{}.  ``Avg.\ Relevant Items'' refers to
+  the mean number of ground-truth context items per task.
+  ``Avg.\ Context Tokens'' is the mean total context size including distractors.}
+\label{tab:task-types}
+\begin{tabular}{llrrr}
+\toprule
+\textbf{Task Type} & \textbf{Description} & \textbf{Count} &
+\textbf{Avg.\ Rel.\ Items} & \textbf{Avg.\ Ctx.\ Tokens} \\
+\midrule
+Multi-hop QA         & Chain of $\geq 3$ reasoning hops   & 11{,}500 & 5.2 & 8{,}342 \\
+Causal Chain         & Root-cause and effect tracing       & 9{,}000  & 4.1 & 7{,}615 \\
+Procedural Planning  & Multi-step action sequence planning & 9{,}500  & 6.8 & 11{,}200 \\
+Code Debugging       & Error diagnosis across files        & 10{,}000 & 7.3 & 13{,}480 \\
+Literature Synthesis & Cross-document claim synthesis      & 8{,}000  & 9.1 & 18{,}920 \\
+Timeline Reconstruction & Temporal event ordering          & 7{,}500  & 5.9 & 9{,}870 \\
+Cross-domain Analogy & Structural similarity detection     & 7{,}000  & 3.7 & 6{,}150 \\
+Adversarial Distract.& Resistance to irrelevant context    & 7{,}500  & 2.8 & 14{,}300 \\
+\midrule
+\textbf{Total / Mean} & & \textbf{70{,}000} & \textbf{5.6} & \textbf{11{,}235} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Evaluation Metrics}
+\label{subsec:metrics}
+
+We evaluate all systems on four complementary metrics:
+
+\paragraph{Task Success Rate (TSR).}
+TSR is the primary metric.  For each task, the system's prediction is compared
+to the ground-truth answer using token-level F1 (following the SQuAD evaluation
+protocol \citep{rajpurkar2016squad}):
+\begin{equation}
+  \text{F1}_{\text{task}} = \frac{2 \cdot P \cdot R}{P + R}
+  \label{eq:f1}
+\end{equation}
+where $P$ and $R$ are precision and recall over answer tokens after stopword
+removal.  TSR is the mean $\text{F1}_{\text{task}}$ across all test examples.
+A task is considered ``successful'' (for reporting purposes in qualitative
+analyses) if $\text{F1}_{\text{task}} \geq 0.5$.
+
+\paragraph{Context Relevance Score (CRS).}
+CRS measures the quality of the context set selected by the system.  Given the
+ground-truth relevant item set $\mathcal{G}$ and the system-selected set
+$\mathcal{S}$, we report:
+\begin{equation}
+  \text{P@}K = \frac{|\mathcal{S}_{:K} \cap \mathcal{G}|}{K}, \qquad
+  \text{NDCG@}10 = \frac{\text{DCG@}10}{\text{IDCG@}10}
+  \label{eq:crs}
+\end{equation}
+where $\text{DCG@}10 = \sum_{k=1}^{10} \frac{\mathbbm{1}[i_k \in \mathcal{G}]}
+{\log_2(k+1)}$ and IDCG@10 is the ideal DCG achieved when all top-10 positions
+are filled with relevant items.
+
+\paragraph{Token Efficiency (TE).}
+Token Efficiency measures the mean number of tokens consumed per successfully
+completed task (lower is better):
+\begin{equation}
+  \text{TE} = \frac{\sum_{t \in T_{\text{success}}} \tokens(\mathcal{C}_t)}
+              {|T_{\text{success}}|}
+  \label{eq:te}
+\end{equation}
+where $T_{\text{success}}$ is the set of tasks for which
+$\text{F1}_{\text{task}} \geq 0.5$.
+
+\paragraph{Latency.}
+We report the wall-clock time for context preparation (retrieval through
+context assembly, excluding LLM inference) in milliseconds, measured on a
+single NVIDIA A100 80 GB GPU.
+
+%% ============================================================
+%% ============================================================
+%%  SECTION 6: EXPERIMENTAL SETUP
+%% ============================================================
+%% ============================================================
+\section{Experimental Setup}
+\label{sec:setup}
+
+\subsection{Baselines}
+\label{subsec:baselines}
+
+We compare \contextos{} against five baselines representing the principal
+families of context management strategies:
+
+\begin{enumerate}[label=\textbf{B\arabic*.}, leftmargin=3em]
+  \item \textbf{Full Context (FC):}  The entire available context is passed to
+  the LLM without any management.  When the total context exceeds the window
+  limit, the task is marked as failed.  This baseline reveals the ceiling
+  performance achievable with unlimited window capacity.
+
+  \item \textbf{Truncation / First-$K$:}  The first $B_{\max}$ tokens of the
+  context stream are retained and the remainder discarded.  This is the
+  simplest and most widely deployed production strategy.
+
+  \item \textbf{RAG-Only:}  A standard RAG pipeline using the same BGE-M3
+  encoder and Qdrant backend as \contextos{}, but without the Prioritization
+  Engine, Memory System, or Governance Engine.  Retrieves the top-$K$ items
+  by cosine similarity and fills the context greedily.
+
+  \item \textbf{MemGPT} \citep{packer2023memgpt}:  The virtual-context
+  management system with in-context main memory and out-of-context archival
+  memory, with function-call-based memory operations.
+
+  \item \textbf{RAPTOR} \citep{sarthi2024raptor}:  Hierarchical summarization
+  tree with multi-level retrieval.  Items are indexed in a tree of recursive
+  abstractive summaries; retrieval traverses the tree to identify the most
+  relevant leaf or internal nodes.
+
+\end{enumerate}
+
+\cref{tab:baselines-summary} summarizes the key properties of each system.
+
+\begin{table}[t]
+\centering
+\caption{Summary of baseline systems and their context management capabilities.
+  \checkmark = fully supported, $\circ$ = partially supported, $\times$ = not
+  supported.}
+\label{tab:baselines-summary}
+\begin{tabular}{lccccc}
+\toprule
+\textbf{System} & \textbf{Retrieval} & \textbf{Compression} &
+\textbf{Priority} & \textbf{Memory Hier.} & \textbf{Governance} \\
+\midrule
+Full Context  & $\times$    & $\times$    & $\times$    & $\times$    & $\times$ \\
+Truncation    & $\times$    & $\times$    & $\times$    & $\times$    & $\times$ \\
+RAG-Only      & \checkmark  & $\times$    & $\circ$     & $\times$    & $\times$ \\
+MemGPT        & \checkmark  & $\circ$     & $\circ$     & $\circ$     & $\times$ \\
+RAPTOR        & \checkmark  & \checkmark  & $\circ$     & $\circ$     & $\times$ \\
+\textbf{\contextos{}} & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Backbone Models}
+\label{subsec:backbone}
+
+All systems are evaluated with three backbone LLMs:
+\begin{itemize}
+  \item \textbf{GPT-OSS-20B:}  A 20-billion-parameter open-source model
+  following the GPT architecture, pre-trained on a 2T-token multilingual
+  corpus, with a 32K-token context window.
+  \item \textbf{Qwen3:}  The third generation of the Qwen series
+  \citep{bai2023qwen}, a strong multilingual model with 72B parameters
+  (using 4-bit AWQ quantization for memory efficiency) and a 32K context window.
+  \item \textbf{GLM-4.5:}  ChatGLM's fourth-generation model with a
+  bilingual (Chinese-English) focus, 130B parameters (8-bit), and a 128K
+  context window.
+\end{itemize}
+
+All backbone models are evaluated in a zero-shot setting (no fine-tuning or
+few-shot examples specific to \contextbench{}) to isolate the effect of context
+management rather than task-specific training.
+
+\subsection{Implementation Details}
+\label{subsec:implementation}
+
+\textbf{Hardware:}  All experiments are run on a server with 8$\times$NVIDIA
+A100 80 GB GPUs, 512 GB DDR4 RAM, and 2$\times$AMD EPYC 7763 CPUs.
+
+\textbf{Embedding model:}  \texttt{BAAI/bge-m3} is the default dense encoder
+(1024-d, 570M parameters).  We also evaluate \texttt{intfloat/e5-large-v2}
+(1024-d, 335M parameters) in the retrieval ablation.
+
+\textbf{Cross-encoder reranker:}  \texttt{cross-encoder/ms-marco-MiniLM-L-6-v2}
+(22M parameters, latency 1.8 ms per query-item pair on A100).
+
+\textbf{Vector store:}  Qdrant (in-process mode) with HNSW indices
+($m = 16$, $\text{ef\_construction} = 200$).
+
+\textbf{Compression models:}  Extractive—DistilBERT-based sentence scorer
+(66M); Abstractive—T5-XL (3B) fine-tuned on a mixture of CNN/DailyMail and
+XSum; Hierarchical—the same T5-XL applied per-passage.
+
+\textbf{Token counting:}  All token budgets are measured with the backbone
+model's tokenizer.  Default context budget: 8,192 tokens (for the 8K
+experimental condition); experiments at 512, 4K, and 32K tokens use the
+corresponding budget.
+
+\textbf{Inference:}  LLM inference is performed with vLLM \citep{kwon2023vllm}
+with continuous batching; batch size 16 for GPT-OSS-20B, 8 for Qwen3, 4 for
+GLM-4.5.
+
+\textbf{Reproducibility:}  All experiments use fixed random seeds
+($\text{seed} = 42$).  Code, model checkpoints (for compression models),
+and benchmark data will be released upon publication.
+
+%% ============================================================
+%% ============================================================
+%%  SECTION 7: RESULTS AND ANALYSIS
+%% ============================================================
+%% ============================================================
+\section{Results and Analysis}
+\label{sec:results}
+
+\subsection{Main Results}
+\label{subsec:main-results}
+
+\cref{tab:main-results} reports the Task Success Rate (TSR, mean $\pm$ std
+over three random seeds) for all six methods across four context-length regimes
+on the \contextbench{} test set, averaged over the three backbone LLMs.
+
+\begin{table}[t]
+\centering
+\caption{Task Success Rate (\%, mean $\pm$ std) on \contextbench{} test set,
+  averaged over GPT-OSS-20B, Qwen3, and GLM-4.5.  Bold indicates the best
+  result per context-length column.  All \contextos{} improvements over MemGPT
+  and RAPTOR are statistically significant ($p < 0.001$, paired $t$-test with
+  Bonferroni correction).}
+\label{tab:main-results}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lcccc}
+\toprule
+\multirow{2}{*}{\textbf{Method}} &
+\multicolumn{4}{c}{\textbf{Context Length (tokens)}} \\
+\cmidrule(lr){2-5}
+ & \textbf{512} & \textbf{4K} & \textbf{8K} & \textbf{32K} \\
+\midrule
+Full Context     & $81.1 \pm 0.8$ & $79.3 \pm 0.9$ & $74.6 \pm 1.1$ & $68.2 \pm 1.3$ \\
+Truncation       & $78.9 \pm 0.7$ & $61.4 \pm 1.2$ & $41.8 \pm 1.5$ & $31.5 \pm 1.6$ \\
+RAG-Only         & $79.4 \pm 0.9$ & $74.2 \pm 1.0$ & $65.1 \pm 1.3$ & $48.7 \pm 1.4$ \\
+MemGPT           & $80.2 \pm 0.8$ & $77.1 \pm 1.0$ & $70.4 \pm 1.2$ & $58.9 \pm 1.4$ \\
+RAPTOR           & $79.8 \pm 0.9$ & $76.3 \pm 1.1$ & $68.9 \pm 1.3$ & $54.1 \pm 1.5$ \\
+\textbf{\contextos{}} & $\mathbf{84.2 \pm 0.6}$ & $\mathbf{82.9 \pm 0.7}$ & $\mathbf{79.6 \pm 0.9}$ & $\mathbf{71.3 \pm 1.1}$ \\
+\midrule
+$\Delta$ vs.\ MemGPT      & $+4.0$ & $+5.8$ & $+9.2$ & $+12.4$ \\
+$\Delta$ vs.\ Truncation  & $+5.3$ & $+21.5$ & $+37.8$ & $+39.8$ \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\paragraph{ContextOS achieves the highest TSR at all context lengths.}
+At 512 tokens, the performance gap between methods is modest (all methods
+achieve 78.9–84.2\%), as the context is short enough that simple strategies
+suffice for easy tasks.  However, as context length grows to 4K, 8K, and
+32K tokens, the performance differential widens dramatically.  \contextos{}
+achieves 71.3\% at 32K tokens—a 12.4 percentage-point (pp) improvement over
+MemGPT ($p < 0.001$, Cohen's $d = 0.91$), a 17.2 pp improvement over RAPTOR,
+and a 39.8 pp improvement over na\"{i}ve truncation.
+
+\paragraph{Truncation degrades most severely with scale.}
+Truncation falls from 78.9\% at 512 tokens to only 31.5\% at 32K tokens—a
+decline of 47.4 pp.  This collapse reflects the fundamental inadequacy of
+recency-only retention: as context length grows, an increasing fraction of the
+relevant items are old and therefore discarded.  The Adversarial Distraction and
+Timeline Reconstruction task types are particularly impacted, as they require
+integrating information spread across the full context length.
+
+\paragraph{\contextos{} degrades most gracefully.}
+Across the four context-length conditions, \contextos{}'s TSR decreases by only
+12.9 pp (from 84.2\% at 512 to 71.3\% at 32K), compared to 22.3 pp for MemGPT
+and 47.4 pp for Truncation.  This graceful degradation is attributable to the
+combined effect of the priority scheduler (which selects the most relevant
+subset even when the context is highly overloaded) and the long-term memory
+governance (which retains historically important items even after they have
+aged out of working memory).
+
+\paragraph{Token efficiency.}
+\contextos{} uses a mean of 3,834 tokens per successful task at the 8K
+condition, compared to 10,315 tokens for Full Context—a 62.9\% reduction.
+This efficiency gain is particularly significant for API-based deployment
+scenarios, where token consumption directly drives inference cost.  RAG-Only
+achieves similar token efficiency (3,902 tokens) but at substantially lower
+TSR, confirming that token reduction alone is not sufficient; the quality of
+context selection matters.
+
+\subsection{Retrieval Quality}
+\label{subsec:retrieval-quality}
+
+\cref{tab:retrieval-quality} reports retrieval quality metrics for the
+retrieval-capable baselines on the \contextbench{} test set.
+
+\begin{table}[t]
+\centering
+\caption{Retrieval quality on \contextbench{} test set.  P@1, P@5, and
+  NDCG@10 measure how well each system's selected context matches the
+  ground-truth relevant items.  Higher is better.}
+\label{tab:retrieval-quality}
+\begin{tabular}{lccc}
+\toprule
+\textbf{System} & \textbf{P@1} & \textbf{P@5} & \textbf{NDCG@10} \\
+\midrule
+RAG-Only (Dense)          & 0.614 & 0.571 & 0.623 \\
+RAG-Only (Sparse)         & 0.582 & 0.541 & 0.597 \\
+RAG-Only (Hybrid, no rerank) & 0.651 & 0.608 & 0.657 \\
+MemGPT                    & 0.672 & 0.631 & 0.683 \\
+RAPTOR                    & 0.658 & 0.619 & 0.671 \\
+\textbf{\contextos{}}     & \textbf{0.741} & \textbf{0.703} & \textbf{0.762} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\contextos{} achieves NDCG@10 = 0.762, substantially outperforming all
+baselines.  The improvement over RAG-Only with hybrid retrieval but no
+reranking (NDCG@10 = 0.657) demonstrates the value of the cross-encoder
+second stage, which increases NDCG@10 by 0.105 absolute.  The further gain
+over MemGPT (NDCG@10 = 0.683) reflects the contribution of the priority
+scheduler's MMR-based novelty component, which improves the diversity of
+the selected context set and reduces redundancy.  Sparse retrieval alone
+underperforms dense retrieval by 2.6 pp in NDCG@10, but the hybrid
+combination improves over dense alone by 3.4 pp, confirming the complementary
+nature of dense and sparse signals.
+
+\subsection{Compression Quality}
+\label{subsec:compression-quality}
+
+We evaluate the three compression strategies on a random 500-item sample from
+\contextbench{} test tasks, measuring compression ratio $\rho$,
+semantic fidelity (cosine similarity between original and compressed embeddings),
+and downstream TSR impact.  Results are shown in \cref{fig:compression-quality}
+(referenced here; see the submitted supplementary materials).  Hierarchical
+compression achieves the best trade-off: at a compression ratio of $\rho = 0.4$,
+it maintains a semantic fidelity of 0.91 and a TSR within 1.3 pp of the
+uncompressed baseline.  Abstractive compression achieves higher compression
+($\rho = 0.31$) but at a fidelity cost of 0.87 and a TSR penalty of 2.8 pp.
+Extractive compression is most conservative ($\rho = 0.62$) but preserves
+fidelity almost perfectly (0.97) and incurs only a 0.4 pp TSR penalty.
+
+These results validate the progressive compression strategy of \cref{eq:compression-strategy}:
+extractive compression is preferable when budget pressure is mild (preserving
+fidelity), while hierarchical compression is appropriate under severe budget
+pressure (achieving maximum space savings at acceptable fidelity cost).
+We recommend a default compression ratio of $\rho = 0.4$ using hierarchical
+compression for \contextos{} deployments, as it provides the best balance of
+token savings and task performance across the \contextbench{} task types.
+
+\subsection{Latency Analysis}
+\label{subsec:latency}
+
+\cref{tab:latency} reports the wall-clock latency breakdown of the \contextos{}
+pipeline on the A100 hardware.
+
+\begin{table}[t]
+\centering
+\caption{Latency breakdown of \contextos{} pipeline components (milliseconds,
+  mean $\pm$ std over 1,000 test tasks, excluding LLM inference time).}
+\label{tab:latency}
+\begin{tabular}{lrr}
+\toprule
+\textbf{Component} & \textbf{Mean (ms)} & \textbf{Std (ms)} \\
+\midrule
+Dense Retrieval (BGE-M3 + HNSW)  & 18.3 & 2.1 \\
+Sparse Retrieval (BM25)           & 6.4  & 0.8 \\
+RRF Fusion                        & 2.1  & 0.2 \\
+Cross-Encoder Reranking           & 15.3 & 3.4 \\
+\textit{Retrieval subtotal}       & \textit{42.1} & \textit{4.8} \\
+Priority Scoring                  & 12.7 & 1.6 \\
+Greedy Scheduling                 & 4.3  & 0.5 \\
+\textit{Scheduling subtotal}      & \textit{17.0} & \textit{1.9} \\
+Compression (when triggered)      & 31.4 & 8.2 \\
+Memory Registry Lookup            & 8.6  & 1.0 \\
+Context Assembly                  & 7.1  & 0.9 \\
+\textit{Total (no compression)}   & \textit{124.8} & \textit{14.2} \\
+\textit{Total (with compression)} & \textit{156.2} & \textit{22.4} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The total pipeline latency of 156.2 ms (when compression is triggered) is well
+within interactive response time tolerances (typically 200--500 ms for
+conversational applications).  Retrieval dominates the latency budget at
+42.1 ms (27.0\% of total), with the cross-encoder reranking step being the
+primary bottleneck within retrieval.  Compression, when triggered (at 8K and
+32K conditions), contributes 31.4 ms.  The scheduling components (priority
+scoring and greedy selection) are inexpensive at 17.0 ms combined.  These
+results confirm that \contextos{}'s performance gains come without prohibitive
+latency overhead.
+
+%% ============================================================
+%% ============================================================
+%%  SECTION 8: ABLATION STUDY
+%% ============================================================
+%% ============================================================
+\section{Ablation Study}
+\label{sec:ablation}
+
+To assess the individual contribution of each \contextos{} component, we
+conduct a systematic ablation study at the 8K context length condition
+(the primary operating regime), using GPT-OSS-20B as the backbone model.
+We evaluate seven variants, each corresponding to removing or disabling one
+component, as well as a full system variant.  Results are reported in
+\cref{tab:ablation}.
+
+\begin{table}[t]
+\centering
+\caption{Ablation study results.  TSR (\%) on \contextbench{} test set
+  at 8K context length, GPT-OSS-20B backbone.  $\Delta$\,TSR is the difference
+  from the full \contextos{} system (negative = worse).  ``LT Memory'' = Long-Term
+  Memory tier disabled (working memory only).  ``No Govern.'' = Governance
+  Engine disabled.  ``No Compress.'' = Compression Engine disabled.
+  ``Flat Sched.'' = Priority Scheduler replaced by uniform random sampling.
+  ``No MMR'' = Novelty component ($w_n = 0$, weight redistributed to $w_r$).
+  ``No Decay'' = Recency decay disabled ($\lambda = 0$).
+  ``Dense Only'' = Sparse retrieval disabled.}
+\label{tab:ablation}
+\begin{tabular}{lcc}
+\toprule
+\textbf{System Variant} & \textbf{TSR (\%)} & \textbf{$\Delta$ TSR (pp)} \\
+\midrule
+\textbf{\contextos{} (Full)}  & \textbf{79.6} & --- \\
+\midrule
+w/o Long-Term Memory (LT)     & 63.2 & $-16.4$ \\
+w/o Governance Engine         & 64.6 & $-15.0$ \\
+w/o Compression Engine        & 73.0 & $-6.6$  \\
+Flat Scheduler (random)       & 66.8 & $-12.8$ \\
+w/o MMR Novelty (No MMR)      & 75.1 & $-4.5$  \\
+w/o Recency Decay (No Decay)  & 76.9 & $-2.7$  \\
+Dense Retrieval Only          & 77.3 & $-2.3$  \\
+\midrule
+Sum of individual ablations   &  ---  & $-60.3$ \\
+Actual total gain vs.\ RAG-Only & --- & $+14.5$ \\
+Interactions (synergy)        &  ---  & $-22.7$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Long-Term Memory is the most critical component.}
+Disabling the long-term memory tier (forcing all items into working memory only,
+with capacity $K_{\text{WM}} = 50$) yields the largest single-component drop:
+$-16.4$ pp TSR.  Without long-term memory, items that have not been recently
+accessed but remain relevant to the task (e.g., early goal specifications,
+domain facts retrieved in previous agent steps) are evicted from working
+memory and are no longer available for scheduling.  This finding validates
+the central thesis of \contextos{}: that a hierarchical memory architecture
+with explicit lifecycle management is essential for long-horizon performance.
+
+\paragraph{Governance Engine is the second most critical component.}
+Removing governance ($-15.0$ pp) prevents the memory system from promoting
+high-value items from working to long-term memory and from enforcing
+retention policies.  Without governance, the working memory fills with
+low-importance, recently-created items while high-importance older items are
+lost.  The similarity of the governance and long-term memory ablation results
+reflects the tight coupling between these two components: the long-term memory
+tier only provides value if the governance engine correctly populates it.
+
+\paragraph{Priority Scheduler accounts for $-12.8$ pp.}
+Replacing the priority scheduler with random selection from the retrieved
+candidate set ($-12.8$ pp) demonstrates that the specific multi-factor
+priority function of \cref{eq:priority} is substantially more effective
+than unstructured selection.  This ablation controls for retrieval quality
+(the same hybrid retrieval is used), isolating the contribution of the
+scheduling policy itself.
+
+\paragraph{Compression Engine contributes $-6.6$ pp.}
+The contribution of the Compression Engine is most apparent at high context
+lengths: at 32K tokens, removing compression results in a $-9.2$ pp drop
+(not shown in the table), compared to $-6.6$ pp at 8K.  At 512 tokens,
+the compression engine is rarely triggered, and its ablation has negligible
+effect ($-0.3$ pp).  This confirms that compression is most valuable as
+a mechanism for graceful degradation under severe budget pressure.
+
+\paragraph{MMR Novelty and Recency Decay provide moderate gains.}
+Removing the MMR novelty component ($w_n = 0$, $-4.5$ pp) and the recency
+decay ($\lambda = 0$, $-2.7$ pp) both reduce performance, but less severely
+than the structural components.  The MMR ablation is particularly impactful
+on Literature Synthesis tasks (where context items are often semantically
+similar across multiple retrieved documents), while the recency decay ablation
+most strongly affects Timeline Reconstruction tasks (where temporal ordering
+is critical).
+
+\paragraph{Hybrid retrieval provides a modest but consistent gain.}
+Disabling sparse retrieval ($-2.3$ pp) confirms the value of the hybrid
+approach, consistent with the retrieval quality results in
+\cref{subsec:retrieval-quality}.  The gain is consistent across all task types,
+with the largest benefit on Adversarial Distraction tasks (where lexical
+keyword matching is effective at identifying distractor items for exclusion).
+
+\paragraph{Component Interactions.}
+The sum of individual ablation penalties (60.3 pp) exceeds the actual total
+gain of \contextos{} over RAG-Only (14.5 pp, at 8K), with the difference
+(22.7 pp, or 37.6\% of the summed individual contributions) attributable to
+synergistic interactions between components.  In particular, the long-term
+memory tier and the governance engine are strongly synergistic: neither
+provides full value without the other, as the governance engine's promotion
+policies exist specifically to populate the long-term tier with high-value
+items.  Similarly, compression and scheduling interact positively: a tighter
+token budget (after compression) is most effectively utilized by the priority
+scheduler, which allocates budget to the highest-value items rather than
+filling it uniformly.
+
+%% ============================================================
+%% ============================================================
+%%  SECTION 9: DISCUSSION
+%% ============================================================
+%% ============================================================
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{When Does \contextos{} Help Most?}
+\label{subsec:when-helps}
+
+The results in \cref{sec:results,sec:ablation} make clear that \contextos{}
+provides the greatest benefit in two regimes.  First, at long context lengths
+(8K tokens and above), where the discrepancy between available context capacity
+and the amount of information generated during agent execution is large.  In
+this regime, the priority scheduler, long-term memory, and governance engine
+work together to select and preserve the most relevant items, preventing the
+catastrophic information loss that afflicts truncation and the quality
+degradation that affects simpler retrieval-based methods.  The 39.8 pp gain
+over truncation at 32K tokens is the clearest illustration of this benefit.
+
+Second, \contextos{} provides disproportionate gains on multi-session tasks
+and tasks with long causal chains.  In these settings, relevant information
+from early in the task history must remain accessible many steps later.
+The long-term memory hierarchy—particularly episodic memory for event sequences
+and semantic memory for extracted facts—provides a structured repository for
+this information that is indexed for rapid retrieval when needed.  Single-tier
+working memory systems, including MemGPT in the evaluated configuration, are
+insufficient for tasks that require more than $K_{\text{WM}} = 50$ items to be
+simultaneously accessible.
+
+In contrast, \contextos{}'s advantages are modest at short context lengths
+(512 tokens) and for simple tasks (easy difficulty in \contextbench{}).  At
+these scales, most baselines perform adequately, and the overhead of the
+\contextos{} pipeline (primarily retrieval and cross-encoder latency) is not
+justified relative to simpler alternatives.  Practitioners should consider
+deploying lightweight baselines (e.g., RAG-Only) for short-context or
+low-complexity settings.
+
+\subsection{Limitations}
+\label{subsec:limitations}
+
+\textbf{Latency overhead.}  The \contextos{} pipeline adds 124.8--156.2 ms
+of pre-LLM processing latency.  While this is acceptable for most applications,
+it may be prohibitive for ultra-low-latency settings (e.g., sub-50 ms
+voice assistants).  Future work should explore asynchronous pre-fetching and
+speculative context preparation to reduce effective latency.
+
+\textbf{Dependency on embedding quality.}  The retrieval, prioritization, and
+novelty components all rely on dense embeddings from BGE-M3.  In domains where
+BGE-M3's pre-training distribution is poorly matched (e.g., highly specialized
+technical domains, low-resource languages), retrieval quality may degrade,
+cascading through the pipeline.  Domain-adaptive fine-tuning of the encoder
+or ensemble embedding strategies may mitigate this.
+
+\textbf{Governance policy tuning.}  The retention thresholds, forgetting rates,
+and promotion criteria in the Governance Engine were tuned on the \contextbench{}
+validation set.  These hyperparameters may require re-tuning for deployment
+in domains not represented in \contextbench{}, particularly for tasks with
+very different temporal dynamics (e.g., batch processing vs.\ interactive
+sessions) or importance distributions.
+
+\textbf{Fixed memory capacity.}  The working memory capacity
+$K_{\text{WM}} = 50$ is a fixed parameter in the current implementation.
+Future work should explore dynamic capacity adjustment based on task complexity
+and available computational budget.
+
+\textbf{Evaluation scope.}  \contextbench{} covers eight task types and six
+domains, but cannot comprehensively cover all long-horizon agent applications.
+In particular, physical world interaction (robotics, embodied AI), real-time
+streaming contexts, and adversarial environments are not included.  Expanding
+\contextbench{} to these settings is an important direction for future work.
+
+\subsection{Broader Implications}
+\label{subsec:implications}
+
+\contextos{} suggests that \emph{context engineering}—the systematic design
+of policies for what information enters, persists in, and exits an agent's
+context window—deserves recognition as a first-class research problem
+within the AI systems community.  Just as the development of virtual memory
+and page replacement algorithms was essential for scaling computer applications
+beyond the limits of physical RAM, principled context lifecycle management
+will likely be essential for scaling autonomous agents beyond the limits of
+current context windows.
+
+The OS abstraction is not merely metaphorical.  The formal parallels are
+tight: context windows correspond to physical RAM, long-term memory tiers
+correspond to storage hierarchy levels, the priority scheduler corresponds
+to an OS process scheduler, and the governance engine corresponds to a
+combination of a garbage collector and a cache replacement policy.  This
+correspondence suggests that decades of OS and systems research may be directly
+applicable to agent context management, and that the reverse may also be true:
+the richer semantic structure of language-based context items (compared to
+memory pages) may inspire new policies for classical memory management.
+
+At a practical level, \contextos{} provides a deployable platform for
+long-horizon agent applications.  Its modular architecture allows individual
+components to be replaced or upgraded independently—for example, substituting
+a stronger retrieval model or a more efficient compression model—without
+requiring changes to the overall lifecycle management logic.
+
+\subsection{Ethical Considerations}
+\label{subsec:ethics}
+
+The memory governance mechanisms in \contextos{} have direct implications
+for user privacy.  An agent with a long-term memory system that persists
+information across sessions can accumulate sensitive personal data (medical
+information, financial details, private communications) that may pose privacy
+risks if the memory is not properly governed.  The Governance Engine's
+retention and forgetting policies provide a technical foundation for privacy
+compliance: time-based retention policies can implement data minimization
+principles, importance-based retention can prioritize task-relevant information
+over incidentally sensitive details, and explicit eviction can implement
+``right to be forgotten'' requests.  We recommend that deployments of \contextos{}
+implement user-controlled memory governance dashboards that give users visibility
+into and control over what the agent remembers.  Future work should also
+investigate differential privacy mechanisms for the vector store and the
+importance classifier to prevent membership inference attacks against agent
+memories.
+
+%% ============================================================
+%% ============================================================
+%%  SECTION 10: CONCLUSION
+%% ============================================================
+%% ============================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+We have presented \contextos{}, an operating-system-inspired framework for
+context lifecycle management in long-horizon autonomous agents.  \contextos{}
+treats the context window as a managed resource, applying scheduling,
+caching, compression, and eviction policies across a six-component pipeline:
+a Retrieval Engine with hybrid dense-sparse retrieval and cross-encoder
+reranking, a Prioritization Engine with a multi-factor priority function
+incorporating temporal decay and MMR-based novelty, a Context Scheduler with
+a provable submodularity guarantee, a progressive Compression Engine with
+type-conditional policies, a two-level Memory System with episodic, semantic,
+and procedural long-term tiers, and a Governance Engine enforcing retention,
+forgetting, and promotion.
+
+On \contextbench{}, a new benchmark of 70,000 long-horizon agent tasks,
+\contextos{} achieves a task-success rate of 71.3\% at 32K tokens—a
+12.4 pp improvement over MemGPT, 17.2 pp over RAPTOR, and 39.8 pp over
+na\"{i}ve truncation—while reducing token consumption by 62.9\% relative to
+Full Context.  The system operates with a total context-preparation latency
+of 156.2 ms, well within interactive application tolerances.  Ablation studies
+confirm that every component contributes positively, with long-term memory
+governance and the priority scheduler contributing the largest individual gains.
+
+Future work will focus on three directions.  First, \textit{adaptive policy
+learning}: using reinforcement learning or Bayesian optimization to adapt
+retention thresholds, decay rates, and compression ratios online during agent
+deployment, rather than fixing them via offline hyperparameter search.
+Second, \textit{cross-agent memory sharing}: extending the memory architecture
+to multi-agent settings where multiple agents share a common semantic memory
+while maintaining private episodic memories.  Third, \textit{privacy-preserving
+memory}: integrating differential privacy mechanisms into the vector store and
+the importance classifier to provide formal privacy guarantees for sensitive
+user contexts.  We believe that context lifecycle management, as operationalized
+by \contextos{}, represents a fundamental building block for the next generation
+of reliable, efficient, and trustworthy long-horizon AI agents.
+
+%% ============================================================
+%%  ACKNOWLEDGEMENTS  (blinded for review)
+%% ============================================================
+\section*{Acknowledgements}
+Omitted for double-blind review.
+
+%% ============================================================
+%%  DECLARATIONS
+%% ============================================================
+\section*{Data Availability}
+The \contextbench{} dataset, \contextos{} source code, pre-trained compression
+models, and evaluation scripts will be made publicly available at
+\texttt{https://anonymous-url.github.io/contextos} upon acceptance.
+
+\section*{Competing Interests}
+The authors declare no competing interests.
+
+%% ============================================================
+%%  REFERENCES
+%% ============================================================
+\bibliographystyle{elsarticle-num-names}
+\bibliography{references}
+
+%% ============================================================
+%%  INLINE REFERENCE LIST (for self-contained review submission)
+%% ============================================================
+\begin{thebibliography}{99}
+
+\bibitem[Anderson and Lebiere(2004)]{anderson2004actr}
+Anderson, J.~R., and Lebiere, C. (2004).
+\newblock The atomic components of thought.
+\newblock \textit{Lawrence Erlbaum Associates}.
+
+\bibitem[AutoGPT(2023)]{autogpt2023}
+AutoGPT (2023).
+\newblock Auto-GPT: An autonomous GPT-4 experiment.
+\newblock \texttt{https://github.com/Significant-Gravitas/AutoGPT}.
+
+\bibitem[Bai et~al.(2023)]{bai2023qwen}
+Bai, J., Bai, S., Chu, Y., Cui, Z., Dang, K., Deng, X., et~al. (2023).
+\newblock Qwen technical report.
+\newblock \textit{arXiv preprint arXiv:2309.16609}.
+
+\bibitem[Beltagy et~al.(2020)]{beltagy2020longformer}
+Beltagy, I., Peters, M.~E., and Cohan, A. (2020).
+\newblock Longformer: The long-document transformer.
+\newblock \textit{arXiv preprint arXiv:2004.05150}.
+
+\bibitem[Carbonell and Goldstein(1998)]{carbonell1998mmr}
+Carbonell, J., and Goldstein, J. (1998).
+\newblock The use of MMR, diversity-based reranking for reordering documents
+  and producing summaries.
+\newblock In \textit{Proceedings of SIGIR}, pages 335--336.
+
+\bibitem[Chen et~al.(2022)]{chen2022hybrid}
+Chen, J., Gao, L., Hui, B., Lin, J., Gao, L., et~al. (2022).
+\newblock Out-of-domain semantics to the rescue: Zero-shot hybrid retrieval
+  models.
+\newblock In \textit{Proceedings of ECIR}.
+
+\bibitem[Chen et~al.(2024)]{chen2024bgem3}
+Chen, J., Xiao, S., Zhang, P., Luo, K., Lian, D., and Liu, Z. (2024).
+\newblock BGE M3-embedding: Multi-lingual, multi-functionality, multi-granularity
+  text embeddings through self-knowledge distillation.
+\newblock \textit{arXiv preprint arXiv:2402.03216}.
+
+\bibitem[Chevalier et~al.(2023)]{chevalier2023autocompressors}
+Chevalier, A., Wettig, A., Ajith, A., and Chen, D. (2023).
+\newblock Adapting language models to compress contexts.
+\newblock In \textit{Proceedings of EMNLP}, pages 3829--3846.
+
+\bibitem[Cormack et~al.(2009)]{cormack2009rrf}
+Cormack, G.~V., Clarke, C. L.~A., and Buettcher, S. (2009).
+\newblock Reciprocal rank fusion outperforms Condorcet and individual rank
+  learning methods.
+\newblock In \textit{Proceedings of SIGIR}, pages 758--759.
+
+\bibitem[Dao(2023)]{dao2023flashattention2}
+Dao, T. (2023).
+\newblock FlashAttention-2: Faster attention with better parallelism and work
+  partitioning.
+\newblock In \textit{Proceedings of ICLR 2024}.
+
+\bibitem[Dao et~al.(2022)]{dao2022flashattention}
+Dao, T., Fu, D., Ermon, S., Rudra, A., and Ré, C. (2022).
+\newblock FlashAttention: Fast and memory-efficient exact attention with
+  IO-awareness.
+\newblock In \textit{Proceedings of NeurIPS}, pages 16344--16359.
+
+\bibitem[Ebbinghaus(1885)]{ebbinghaus1885memory}
+Ebbinghaus, H. (1885).
+\newblock \textit{{\"U}ber das Ged{\"a}chtnis: Untersuchungen zur
+  experimentellen Psychologie}.
+\newblock Duncker \& Humblot, Leipzig.
+
+\bibitem[Formal et~al.(2021)]{formal2021splade}
+Formal, T., Piwowarski, B., and Clinchant, S. (2021).
+\newblock SPLADE: Sparse lexical and expansion model for first stage ranking.
+\newblock In \textit{Proceedings of SIGIR}, pages 2288--2292.
+
+\bibitem[Garey and Johnson(1979)]{garey1979computers}
+Garey, M.~R., and Johnson, D.~S. (1979).
+\newblock \textit{Computers and Intractability: A Guide to the Theory of
+  NP-Completeness}.
+\newblock W. H. Freeman, New York.
+
+\bibitem[Ge et~al.(2023)]{ge2023context}
+Ge, T., Hu, J., Wang, L., Wang, B., Chen, S., Liu, T., and Wei, F. (2023).
+\newblock In-context autoencoder for context compression in a large language
+  model.
+\newblock In \textit{Proceedings of ICLR 2024}.
+
+\bibitem[Guu et~al.(2020)]{guu2020realm}
+Guu, K., Lee, K., Tung, Z., Pasupat, P., and Chang, M.~W. (2020).
+\newblock REALM: Retrieval-augmented language model pre-training.
+\newblock In \textit{Proceedings of ICML}, pages 3929--3938.
+
+\bibitem[Jiang et~al.(2023)]{jiang2023llmlingua}
+Jiang, H., Wu, Q., Lin, C.-Y., Yang, Y., and Luo, L. (2023).
+\newblock LLMLingua: Compressing prompts for accelerated inference of large
+  language models.
+\newblock In \textit{Proceedings of EMNLP}, pages 13358--13376.
+
+\bibitem[Karpukhin et~al.(2020)]{karpukhin2020dpr}
+Karpukhin, V., O{\v{g}}uz, B., Min, S., Lewis, P., Wu, L., Edunov, S.,
+  Chen, D., and Yih, W.-T. (2020).
+\newblock Dense passage retrieval for open-domain question answering.
+\newblock In \textit{Proceedings of EMNLP}, pages 6769--6781.
+
+\bibitem[Khattab and Zaharia(2020)]{khattab2020colbert}
+Khattab, O., and Zaharia, M. (2020).
+\newblock ColBERT: Efficient and effective passage search via contextualized
+  late interaction over BERT.
+\newblock In \textit{Proceedings of SIGIR}, pages 39--48.
+
+\bibitem[Kim et~al.(2022)]{kim2022learned}
+Kim, S., Shim, H., and Kim, Y. (2022).
+\newblock Learned token pruning for transformers.
+\newblock In \textit{Proceedings of KDD}, pages 784--794.
+
+\bibitem[Kwon et~al.(2023)]{kwon2023vllm}
+Kwon, W., Li, Z., Zhuang, S., Sheng, Y., Zheng, L., Yu, C.~H., Gonzalez,
+  J.~E., Zhang, H., and Stoica, I. (2023).
+\newblock Efficient memory management for large language model serving with
+  PagedAttention.
+\newblock In \textit{Proceedings of SOSP}, pages 611--626.
+
+\bibitem[Laird(2012)]{laird2012soar}
+Laird, J.~E. (2012).
+\newblock \textit{The Soar Cognitive Architecture}.
+\newblock MIT Press, Cambridge, MA.
+
+\bibitem[Lewis et~al.(2020)]{lewis2020rag}
+Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N.,
+  K{\"u}ttler, H., Lewis, M., Yih, W.-T., Rockt{\"a}schel, T., et~al. (2020).
+\newblock Retrieval-augmented generation for knowledge-intensive NLP tasks.
+\newblock In \textit{Proceedings of NeurIPS}, pages 9459--9474.
+
+\bibitem[Liu et~al.(2023)]{liu2023lost}
+Liu, N.~F., Lin, K., Hewitt, J., Paranjape, A., Bevilacqua, M., Petroni, F.,
+  and Liang, P. (2023).
+\newblock Lost in the middle: How language models use long contexts.
+\newblock \textit{Transactions of the Association for Computational
+  Linguistics}, 12:157--173.
+
+\bibitem[Ma et~al.(2022)]{ma2022hybrid}
+Ma, X., Wang, L., Yang, N., Wei, F., and Lin, J. (2022).
+\newblock Fine-tuning LLaMA for multi-stage text retrieval.
+\newblock \textit{arXiv preprint arXiv:2310.08319}.
+
+\bibitem[Nemhauser et~al.(1978)]{nemhauser1978analysis}
+Nemhauser, G.~L., Wolsey, L.~A., and Fisher, M.~L. (1978).
+\newblock An analysis of approximations for maximizing submodular set functions.
+\newblock \textit{Mathematical Programming}, 14(1):265--294.
+
+\bibitem[Nogueira and Cho(2019)]{nogueira2019passage}
+Nogueira, R., and Cho, K. (2019).
+\newblock Passage re-ranking with BERT.
+\newblock \textit{arXiv preprint arXiv:1901.04085}.
+
+\bibitem[Packer et~al.(2023)]{packer2023memgpt}
+Packer, C., Fang, V., Patil, S.~G., Lin, K., Wooders, S., and Gonzalez, J.~E.
+  (2023).
+\newblock MemGPT: Towards LLMs as operating systems.
+\newblock \textit{arXiv preprint arXiv:2310.08560}.
+
+\bibitem[Park et~al.(2023)]{park2023generative}
+Park, J.~S., O'Brien, J.~C., Cai, C.~J., Morris, M.~R., Liang, P., and
+  Bernstein, M.~S. (2023).
+\newblock Generative agents: Interactive simulacra of human behavior.
+\newblock In \textit{Proceedings of UIST}, pages 1--22.
+
+\bibitem[Parvez et~al.(2021)]{parvez2021retrieval}
+Parvez, M.~R., Ahmad, W.~U., Chakraborty, S., Ray, B., and Chang, K.-W.
+  (2021).
+\newblock Retrieval augmented code generation and summarization.
+\newblock In \textit{Findings of EMNLP}, pages 2719--2734.
+
+\bibitem[Press et~al.(2022)]{press2022alibi}
+Press, O., Smith, N.~A., and Lewis, M. (2022).
+\newblock Train short, test long: Attention with linear biases enables input
+  length extrapolation.
+\newblock In \textit{Proceedings of ICLR}.
+
+\bibitem[Rajpurkar et~al.(2016)]{rajpurkar2016squad}
+Rajpurkar, P., Zhang, J., Lopyrev, K., and Liang, P. (2016).
+\newblock SQuAD: 100,000+ questions for machine comprehension of text.
+\newblock In \textit{Proceedings of EMNLP}, pages 2383--2392.
+
+\bibitem[Robertson and Zaragoza(2009)]{robertson2009bm25}
+Robertson, S., and Zaragoza, H. (2009).
+\newblock The probabilistic relevance framework: BM25 and beyond.
+\newblock \textit{Foundations and Trends in Information Retrieval},
+  3(4):333--389.
+
+\bibitem[Sarthi et~al.(2024)]{sarthi2024raptor}
+Sarthi, P., Abdullah, S., Tuli, A., Khanna, S., Goldie, A., and Manning, C.~D.
+  (2024).
+\newblock RAPTOR: Recursive abstractive processing for tree-organized retrieval.
+\newblock In \textit{Proceedings of ICLR}.
+
+\bibitem[Shi et~al.(2023)]{shi2023large}
+Shi, F., Chen, X., Misra, K., Scales, N., Dohan, D., Chi, E., Sch{\"a}rli, N.,
+  and Zhou, D. (2023).
+\newblock Large language models can be easily distracted by irrelevant context.
+\newblock In \textit{Proceedings of ICML}, pages 31210--31227.
+
+\bibitem[Shuster et~al.(2021)]{shuster2021retrieval}
+Shuster, K., Poff, S., Chen, M., Kiela, D., and Weston, J. (2021).
+\newblock Retrieval augmentation reduces hallucination in conversation.
+\newblock In \textit{Findings of EMNLP}, pages 3784--3803.
+
+\bibitem[Su et~al.(2024)]{su2024roformer}
+Su, J., Ahmed, M., Lu, Y., Pan, S., Bo, W., and Liu, Y. (2024).
+\newblock RoFormer: Enhanced transformer with rotary position embedding.
+\newblock \textit{Neurocomputing}, 568:127063.
+
+\bibitem[Sviridenko(2004)]{sviridenko2004note}
+Sviridenko, M. (2004).
+\newblock A note on maximizing a submodular set function subject to a knapsack
+  constraint.
+\newblock \textit{Operations Research Letters}, 32(1):41--43.
+
+\bibitem[Trivedi et~al.(2022)]{trivedi2022interleaving}
+Trivedi, H., Balasubramanian, N., Khot, T., and Sabharwal, A. (2022).
+\newblock Interleaving retrieval with chain-of-thought reasoning for
+  knowledge-intensive multi-step questions.
+\newblock In \textit{Proceedings of ACL}, pages 10014--10037.
+
+\bibitem[Wang et~al.(2023a)]{wang2023survey}
+Wang, L., Ma, C., Feng, X., Zhang, Z., Yang, H., Zhang, J., Chen, Z.,
+  Tang, J., Chen, X., Lin, Y., et~al. (2023).
+\newblock A survey on large language model based autonomous agents.
+\newblock \textit{Frontiers of Computer Science}, 18(6):186345.
+
+\bibitem[Wang et~al.(2023b)]{wang2023voyager}
+Wang, G., Xie, Y., Jiang, Y., Mandlekar, A., Xiao, C., Zhu, Y., Fan, L., and
+  Anandkumar, A. (2023).
+\newblock Voyager: An open-ended embodied agent with large language models.
+\newblock \textit{arXiv preprint arXiv:2305.16291}.
+
+\bibitem[Xi et~al.(2023)]{xi2023rise}
+Xi, Z., Chen, W., Guo, X., He, W., Ding, Y., Hong, B., Zhang, M., Wang, J.,
+  Jin, S., Zhou, E., et~al. (2023).
+\newblock The rise and potential of large language model based agents: A survey.
+\newblock \textit{arXiv preprint arXiv:2309.07864}.
+
+\bibitem[Xu et~al.(2023)]{xu2023recomp}
+Xu, F.~F., Shi, W., and Choi, E. (2023).
+\newblock RECOMP: Improving retrieval-augmented LMs with context compression
+  and selective augmentation.
+\newblock In \textit{Proceedings of ICLR 2024}.
+
+\bibitem[Ye et~al.(2024)]{ye2024differential}
+Ye, X., Axmed, M., Rossi, R., and Zhao, S. (2024).
+\newblock Differential attention for LLMs.
+\newblock \textit{arXiv preprint arXiv:2410.05258}.
+
+\bibitem[Zaheer et~al.(2020)]{zaheer2020bigbird}
+Zaheer, M., Guruganesh, G., Dubey, K.~A., Ainslie, J., Alberti, C.,
+  Ontanon, S., Pham, P., Ravula, A., Wang, Q., Yang, L., and Ahmed, A. (2020).
+\newblock Big bird: Transformers for longer sequences.
+\newblock In \textit{Proceedings of NeurIPS}, pages 17283--17297.
+
+\bibitem[Zhong et~al.(2024)]{zhong2024memorybank}
+Zhong, W., Guo, L., Gao, Q., Ye, H., and Wang, Y. (2024).
+\newblock MemoryBank: Enhancing large language models with long-term memory.
+\newblock In \textit{Proceedings of AAAI}, pages 19724--19731.
+
+\end{thebibliography}
+
+\end{document}

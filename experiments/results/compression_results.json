@@ -1,0 +1,140 @@
+{
+  "experiment_date": "2026-06-12",
+  "description": "Compression quality and efficiency metrics across summarization methods",
+  "methods": [
+    "extractive",
+    "abstractive",
+    "hierarchical",
+    "contextos_adaptive"
+  ],
+  "rouge_l": {
+    "extractive": {
+      "mean": 0.512,
+      "std": 0.031
+    },
+    "abstractive": {
+      "mean": 0.483,
+      "std": 0.028
+    },
+    "hierarchical": {
+      "mean": 0.531,
+      "std": 0.027
+    },
+    "contextos_adaptive": {
+      "mean": 0.604,
+      "std": 0.022
+    }
+  },
+  "rouge_1": {
+    "extractive": {
+      "mean": 0.581,
+      "std": 0.029
+    },
+    "abstractive": {
+      "mean": 0.554,
+      "std": 0.026
+    },
+    "hierarchical": {
+      "mean": 0.597,
+      "std": 0.025
+    },
+    "contextos_adaptive": {
+      "mean": 0.672,
+      "std": 0.02
+    }
+  },
+  "rouge_2": {
+    "extractive": {
+      "mean": 0.342,
+      "std": 0.034
+    },
+    "abstractive": {
+      "mean": 0.318,
+      "std": 0.031
+    },
+    "hierarchical": {
+      "mean": 0.361,
+      "std": 0.029
+    },
+    "contextos_adaptive": {
+      "mean": 0.441,
+      "std": 0.025
+    }
+  },
+  "compression_ratios": {
+    "extractive": {
+      "mean": 0.48,
+      "std": 0.07,
+      "description": "tokens retained / original tokens"
+    },
+    "abstractive": {
+      "mean": 0.32,
+      "std": 0.06,
+      "description": "tokens retained / original tokens"
+    },
+    "hierarchical": {
+      "mean": 0.41,
+      "std": 0.06,
+      "description": "tokens retained / original tokens"
+    },
+    "contextos_adaptive": {
+      "mean": 0.37,
+      "std": 0.05,
+      "description": "tokens retained / original tokens"
+    }
+  },
+  "semantic_similarity": {
+    "extractive": {
+      "cosine_mean": 0.831,
+      "cosine_std": 0.041
+    },
+    "abstractive": {
+      "cosine_mean": 0.812,
+      "cosine_std": 0.038
+    },
+    "hierarchical": {
+      "cosine_mean": 0.849,
+      "cosine_std": 0.035
+    },
+    "contextos_adaptive": {
+      "cosine_mean": 0.903,
+      "cosine_std": 0.027
+    }
+  },
+  "factual_consistency": {
+    "extractive": {
+      "mean": 0.871,
+      "std": 0.032
+    },
+    "abstractive": {
+      "mean": 0.824,
+      "std": 0.041
+    },
+    "hierarchical": {
+      "mean": 0.889,
+      "std": 0.029
+    },
+    "contextos_adaptive": {
+      "mean": 0.934,
+      "std": 0.021
+    }
+  },
+  "compression_latency_ms": {
+    "extractive": {
+      "mean": 18.4,
+      "std": 3.2
+    },
+    "abstractive": {
+      "mean": 94.7,
+      "std": 12.1
+    },
+    "hierarchical": {
+      "mean": 142.3,
+      "std": 18.4
+    },
+    "contextos_adaptive": {
+      "mean": 67.2,
+      "std": 9.8
+    }
+  }
+}

@@ -1,0 +1,281 @@
+{
+  "experiment_date": "2026-06-12",
+  "description": "Retrieval quality metrics for different retrieval strategies",
+  "methods": [
+    "bm25",
+    "dense_retrieval",
+    "hybrid",
+    "raptor_retrieval",
+    "contextos_retrieval"
+  ],
+  "precision_at_k": {
+    "P@1": {
+      "bm25": {
+        "mean": 0.641,
+        "std": 0.028
+      },
+      "dense_retrieval": {
+        "mean": 0.712,
+        "std": 0.024
+      },
+      "hybrid": {
+        "mean": 0.748,
+        "std": 0.022
+      },
+      "raptor_retrieval": {
+        "mean": 0.763,
+        "std": 0.021
+      },
+      "contextos_retrieval": {
+        "mean": 0.891,
+        "std": 0.016
+      }
+    },
+    "P@3": {
+      "bm25": {
+        "mean": 0.584,
+        "std": 0.031
+      },
+      "dense_retrieval": {
+        "mean": 0.658,
+        "std": 0.027
+      },
+      "hybrid": {
+        "mean": 0.691,
+        "std": 0.025
+      },
+      "raptor_retrieval": {
+        "mean": 0.709,
+        "std": 0.024
+      },
+      "contextos_retrieval": {
+        "mean": 0.841,
+        "std": 0.019
+      }
+    },
+    "P@5": {
+      "bm25": {
+        "mean": 0.531,
+        "std": 0.033
+      },
+      "dense_retrieval": {
+        "mean": 0.601,
+        "std": 0.029
+      },
+      "hybrid": {
+        "mean": 0.634,
+        "std": 0.027
+      },
+      "raptor_retrieval": {
+        "mean": 0.651,
+        "std": 0.026
+      },
+      "contextos_retrieval": {
+        "mean": 0.782,
+        "std": 0.021
+      }
+    },
+    "P@10": {
+      "bm25": {
+        "mean": 0.462,
+        "std": 0.036
+      },
+      "dense_retrieval": {
+        "mean": 0.531,
+        "std": 0.032
+      },
+      "hybrid": {
+        "mean": 0.563,
+        "std": 0.03
+      },
+      "raptor_retrieval": {
+        "mean": 0.579,
+        "std": 0.029
+      },
+      "contextos_retrieval": {
+        "mean": 0.711,
+        "std": 0.023
+      }
+    }
+  },
+  "ndcg_at_k": {
+    "NDCG@1": {
+      "bm25": {
+        "mean": 0.641,
+        "std": 0.028
+      },
+      "dense_retrieval": {
+        "mean": 0.712,
+        "std": 0.024
+      },
+      "hybrid": {
+        "mean": 0.748,
+        "std": 0.022
+      },
+      "raptor_retrieval": {
+        "mean": 0.763,
+        "std": 0.021
+      },
+      "contextos_retrieval": {
+        "mean": 0.891,
+        "std": 0.016
+      }
+    },
+    "NDCG@3": {
+      "bm25": {
+        "mean": 0.598,
+        "std": 0.03
+      },
+      "dense_retrieval": {
+        "mean": 0.671,
+        "std": 0.026
+      },
+      "hybrid": {
+        "mean": 0.704,
+        "std": 0.024
+      },
+      "raptor_retrieval": {
+        "mean": 0.721,
+        "std": 0.023
+      },
+      "contextos_retrieval": {
+        "mean": 0.853,
+        "std": 0.018
+      }
+    },
+    "NDCG@5": {
+      "bm25": {
+        "mean": 0.572,
+        "std": 0.032
+      },
+      "dense_retrieval": {
+        "mean": 0.644,
+        "std": 0.028
+      },
+      "hybrid": {
+        "mean": 0.678,
+        "std": 0.026
+      },
+      "raptor_retrieval": {
+        "mean": 0.695,
+        "std": 0.025
+      },
+      "contextos_retrieval": {
+        "mean": 0.831,
+        "std": 0.02
+      }
+    },
+    "NDCG@10": {
+      "bm25": {
+        "mean": 0.541,
+        "std": 0.034
+      },
+      "dense_retrieval": {
+        "mean": 0.614,
+        "std": 0.03
+      },
+      "hybrid": {
+        "mean": 0.648,
+        "std": 0.028
+      },
+      "raptor_retrieval": {
+        "mean": 0.664,
+        "std": 0.027
+      },
+      "contextos_retrieval": {
+        "mean": 0.802,
+        "std": 0.022
+      }
+    }
+  },
+  "mrr": {
+    "bm25": {
+      "mean": 0.612,
+      "std": 0.029
+    },
+    "dense_retrieval": {
+      "mean": 0.684,
+      "std": 0.025
+    },
+    "hybrid": {
+      "mean": 0.718,
+      "std": 0.023
+    },
+    "raptor_retrieval": {
+      "mean": 0.735,
+      "std": 0.022
+    },
+    "contextos_retrieval": {
+      "mean": 0.871,
+      "std": 0.017
+    }
+  },
+  "recall_at_k": {
+    "R@5": {
+      "bm25": {
+        "mean": 0.623,
+        "std": 0.034
+      },
+      "dense_retrieval": {
+        "mean": 0.698,
+        "std": 0.03
+      },
+      "hybrid": {
+        "mean": 0.731,
+        "std": 0.028
+      },
+      "raptor_retrieval": {
+        "mean": 0.749,
+        "std": 0.027
+      },
+      "contextos_retrieval": {
+        "mean": 0.874,
+        "std": 0.021
+      }
+    },
+    "R@10": {
+      "bm25": {
+        "mean": 0.712,
+        "std": 0.031
+      },
+      "dense_retrieval": {
+        "mean": 0.784,
+        "std": 0.027
+      },
+      "hybrid": {
+        "mean": 0.814,
+        "std": 0.025
+      },
+      "raptor_retrieval": {
+        "mean": 0.829,
+        "std": 0.024
+      },
+      "contextos_retrieval": {
+        "mean": 0.931,
+        "std": 0.018
+      }
+    }
+  },
+  "retrieval_latency_ms": {
+    "bm25": {
+      "mean": 12.4,
+      "std": 2.1
+    },
+    "dense_retrieval": {
+      "mean": 38.7,
+      "std": 5.4
+    },
+    "hybrid": {
+      "mean": 52.1,
+      "std": 6.8
+    },
+    "raptor_retrieval": {
+      "mean": 143.6,
+      "std": 18.2
+    },
+    "contextos_retrieval": {
+      "mean": 89.3,
+      "std": 11.4
+    }
+  }
+}

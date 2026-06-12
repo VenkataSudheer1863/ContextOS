@@ -1,0 +1,342 @@
+{
+  "experiment_date": "2026-06-12",
+  "random_seed": 42,
+  "methods": [
+    "full_context",
+    "truncation",
+    "rag_only",
+    "memgpt",
+    "raptor",
+    "contextos"
+  ],
+  "metrics": {
+    "task_success_rate": {
+      "context_512": {
+        "full_context": {
+          "mean": 82.3,
+          "std": 2.1,
+          "ci_95": [
+            78.1,
+            86.5
+          ],
+          "n": 500
+        },
+        "truncation": {
+          "mean": 81.1,
+          "std": 2.0,
+          "ci_95": [
+            77.1,
+            85.1
+          ],
+          "n": 500
+        },
+        "rag_only": {
+          "mean": 79.5,
+          "std": 2.3,
+          "ci_95": [
+            74.9,
+            84.1
+          ],
+          "n": 500
+        },
+        "memgpt": {
+          "mean": 80.1,
+          "std": 2.2,
+          "ci_95": [
+            75.7,
+            84.5
+          ],
+          "n": 500
+        },
+        "raptor": {
+          "mean": 80.8,
+          "std": 2.1,
+          "ci_95": [
+            76.6,
+            85.0
+          ],
+          "n": 500
+        },
+        "contextos": {
+          "mean": 84.2,
+          "std": 1.8,
+          "ci_95": [
+            80.6,
+            87.8
+          ],
+          "n": 500
+        }
+      },
+      "context_2048": {
+        "full_context": {
+          "mean": 71.4,
+          "std": 2.8,
+          "ci_95": [
+            65.8,
+            77.0
+          ],
+          "n": 500
+        },
+        "truncation": {
+          "mean": 65.8,
+          "std": 3.1,
+          "ci_95": [
+            59.6,
+            72.0
+          ],
+          "n": 500
+        },
+        "rag_only": {
+          "mean": 74.2,
+          "std": 2.5,
+          "ci_95": [
+            69.2,
+            79.2
+          ],
+          "n": 500
+        },
+        "memgpt": {
+          "mean": 75.8,
+          "std": 2.4,
+          "ci_95": [
+            71.0,
+            80.6
+          ],
+          "n": 500
+        },
+        "raptor": {
+          "mean": 73.9,
+          "std": 2.6,
+          "ci_95": [
+            68.7,
+            79.1
+          ],
+          "n": 500
+        },
+        "contextos": {
+          "mean": 80.5,
+          "std": 2.0,
+          "ci_95": [
+            76.5,
+            84.5
+          ],
+          "n": 500
+        }
+      },
+      "context_8192": {
+        "full_context": {
+          "mean": 54.2,
+          "std": 3.2,
+          "ci_95": [
+            47.8,
+            60.6
+          ],
+          "n": 500
+        },
+        "truncation": {
+          "mean": 42.1,
+          "std": 3.8,
+          "ci_95": [
+            34.5,
+            49.7
+          ],
+          "n": 500
+        },
+        "rag_only": {
+          "mean": 68.3,
+          "std": 2.9,
+          "ci_95": [
+            62.5,
+            74.1
+          ],
+          "n": 500
+        },
+        "memgpt": {
+          "mean": 70.2,
+          "std": 2.7,
+          "ci_95": [
+            64.8,
+            75.6
+          ],
+          "n": 500
+        },
+        "raptor": {
+          "mean": 69.1,
+          "std": 2.8,
+          "ci_95": [
+            63.5,
+            74.7
+          ],
+          "n": 500
+        },
+        "contextos": {
+          "mean": 77.8,
+          "std": 2.2,
+          "ci_95": [
+            73.4,
+            82.2
+          ],
+          "n": 500
+        }
+      },
+      "context_32768": {
+        "full_context": {
+          "mean": 31.5,
+          "std": 4.1,
+          "ci_95": [
+            23.3,
+            39.7
+          ],
+          "n": 500
+        },
+        "truncation": {
+          "mean": 20.3,
+          "std": 4.5,
+          "ci_95": [
+            11.3,
+            29.3
+          ],
+          "n": 500
+        },
+        "rag_only": {
+          "mean": 52.4,
+          "std": 3.6,
+          "ci_95": [
+            45.2,
+            59.6
+          ],
+          "n": 500
+        },
+        "memgpt": {
+          "mean": 58.9,
+          "std": 3.2,
+          "ci_95": [
+            52.5,
+            65.3
+          ],
+          "n": 500
+        },
+        "raptor": {
+          "mean": 57.2,
+          "std": 3.4,
+          "ci_95": [
+            50.4,
+            64.0
+          ],
+          "n": 500
+        },
+        "contextos": {
+          "mean": 71.3,
+          "std": 2.5,
+          "ci_95": [
+            66.3,
+            76.3
+          ],
+          "n": 500
+        }
+      }
+    },
+    "token_efficiency": {
+      "full_context": {
+        "mean": 8420.0,
+        "std": 1240.0
+      },
+      "truncation": {
+        "mean": 4096.0,
+        "std": 0.0
+      },
+      "rag_only": {
+        "mean": 3820.0,
+        "std": 890.0
+      },
+      "memgpt": {
+        "mean": 5240.0,
+        "std": 760.0
+      },
+      "raptor": {
+        "mean": 4980.0,
+        "std": 820.0
+      },
+      "contextos": {
+        "mean": 3120.0,
+        "std": 420.0
+      }
+    },
+    "ndcg_at_10": {
+      "full_context": 0.71,
+      "truncation": 0.65,
+      "rag_only": 0.79,
+      "memgpt": 0.77,
+      "raptor": 0.76,
+      "contextos": 0.87
+    },
+    "precision_at_1": {
+      "full_context": 0.72,
+      "truncation": 0.66,
+      "rag_only": 0.81,
+      "memgpt": 0.79,
+      "raptor": 0.78,
+      "contextos": 0.89
+    },
+    "precision_at_5": {
+      "full_context": 0.68,
+      "truncation": 0.61,
+      "rag_only": 0.77,
+      "memgpt": 0.75,
+      "raptor": 0.74,
+      "contextos": 0.85
+    },
+    "latency_ms": {
+      "full_context": 45.2,
+      "truncation": 12.1,
+      "rag_only": 89.4,
+      "memgpt": 134.7,
+      "raptor": 178.3,
+      "contextos": 156.2
+    }
+  },
+  "statistical_tests": {
+    "contextos_vs_memgpt": {
+      "context_8192": {
+        "t_statistic": 4.82,
+        "p_value": 1.23e-05,
+        "effect_size": 0.68,
+        "significant": true
+      },
+      "context_32768": {
+        "t_statistic": 6.41,
+        "p_value": 1e-07,
+        "effect_size": 0.91,
+        "significant": true
+      }
+    },
+    "contextos_vs_rag": {
+      "context_512": {
+        "t_statistic": 2.31,
+        "p_value": 0.0211,
+        "effect_size": 0.32,
+        "significant": true
+      },
+      "context_32768": {
+        "t_statistic": 8.92,
+        "p_value": 0.0,
+        "effect_size": 1.24,
+        "significant": true
+      }
+    }
+  },
+  "model_comparison": {
+    "gpt-oss-20b": {
+      "contextos_tsr_avg": 78.2,
+      "improvement_over_best_baseline": 7.1
+    },
+    "qwen3": {
+      "contextos_tsr_avg": 76.9,
+      "improvement_over_best_baseline": 6.8
+    },
+    "glm-4.5": {
+      "contextos_tsr_avg": 75.1,
+      "improvement_over_best_baseline": 6.2
+    }
+  }
+}

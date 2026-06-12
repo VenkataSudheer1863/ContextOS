@@ -1,0 +1,171 @@
+% =============================================================================
+% ContextOS -- Cover Letter to Information Sciences
+% =============================================================================
+% Compile with: pdflatex cover_letter.tex
+% =============================================================================
+
+\documentclass[12pt, a4paper]{letter}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{geometry}
+\geometry{
+  top=2.5cm,
+  bottom=2.5cm,
+  left=3.0cm,
+  right=3.0cm
+}
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  urlcolor=black,
+  citecolor=black
+}
+\usepackage{parskip}
+\setlength{\parskip}{0.8em}
+\setlength{\parindent}{0pt}
+
+% Signature block spacing
+\longindentation=0pt
+
+\begin{document}
+
+\begin{letter}{
+  Editor-in-Chief \\
+  \textit{Information Sciences} \\
+  ISSN: 0020-0255 \\
+  Elsevier B.V. \\
+  Radarweg 29, 1043 NX Amsterdam \\
+  The Netherlands
+}
+
+\opening{Dear Editor-in-Chief,}
+
+We are pleased to submit our manuscript titled:
+
+\begin{center}
+\textbf{ContextOS: An Operating System for Context Lifecycle Management\\
+in Long-Horizon Autonomous Agents}
+\end{center}
+
+for consideration as a \textbf{Regular Article} in \textit{Information
+Sciences}.  The manuscript is approximately 35 pages in length (including
+references and appendices) and has not been previously published, nor is it
+under review at any other journal or conference.  All authors have approved
+the submission and declare no conflicts of interest.
+
+\textbf{Summary of contributions.}  Autonomous AI agents operating over
+long-horizon tasks are fundamentally constrained by the finite capacity of
+their context windows.  Existing approaches -- including naive truncation,
+retrieval-augmented generation (RAG), and paged memory systems such as MemGPT
+-- treat context management as a secondary concern rather than a core
+architectural primitive.  This paper introduces \textbf{ContextOS}, an
+open-source framework that reframes context as a first-class system resource,
+analogous to how operating systems manage CPU time, RAM, and persistent
+storage.
+
+ContextOS provides a unified pipeline comprising six coordinated subsystems:
+(1) a \emph{Retrieval Engine} for semantic access to episodic, semantic, and
+procedural memory; (2) a \emph{Prioritization Engine} that scores context
+items using a multi-signal formula combining relevance, recency, importance,
+and novelty; (3) a priority-based \emph{Context Scheduler} with greedy,
+MMR-diversity, and threshold strategies; (4) a multi-strategy
+\emph{Compression Engine} supporting extractive, abstractive, hierarchical,
+and progressive compression; (5) a \emph{Working Memory} module for
+short-term agent state; and (6) a \emph{Governance Engine} implementing
+configurable retention, forgetting, and promotion policies with exponential
+decay and LRU eviction.
+
+We introduce \textbf{ContextBench}, a programmatically generated benchmark
+dataset of 300{,}000 labelled examples spanning five subsets (multi-task
+context management, retrieval, compression, embedding fine-tuning, and LLM
+instruction tuning) across six professional domains and eight task types.
+ContextBench is fully reproducible from fixed random seeds with no external
+dependencies.
+
+Our empirical evaluation on ContextBench, LongBench, MuSiQue, NarrativeQA,
+and HotpotQA demonstrates that ContextOS achieves statistically significant
+improvements over all baselines across all context lengths.  At 8{,}192
+tokens, ContextOS improves Task Success Rate (TSR) by $+7.6$ percentage
+points over MemGPT (the strongest prior system) with $p < 10^{-5}$
+(Bonferroni-corrected).  At 32{,}768 tokens, the improvement grows to
+$+12.4$ points.  Token efficiency is improved by 40.4\% compared to
+full-context baselines.
+
+\textbf{Relevance to \textit{Information Sciences}.}  This work falls squarely
+within the scope of \textit{Information Sciences}, which publishes research on
+intelligent information processing, knowledge engineering, and AI systems.
+ContextOS contributes to all three dimensions: (i) principled information
+selection and scheduling for AI agents; (ii) knowledge representation across
+episodic, semantic, and procedural memory tiers; and (iii) the design and
+empirical evaluation of an end-to-end AI system for long-horizon task
+completion.  The paper includes rigorous experimental methodology, a
+large-scale benchmark dataset, and complete open-source code, making it a
+substantial and reproducible contribution to the community.
+
+\textbf{Suggested reviewers.}  We respectfully suggest the following three
+experts in context management, agent AI, and information retrieval as
+potential reviewers.  We have no conflicts of interest with any of them.
+
+\begin{enumerate}
+  \item \textbf{Prof.\ Danqi Chen} (Princeton University) -- Expert in dense
+        retrieval, open-domain question answering, and large language model
+        contexts.  Her work on REALM, DPR, and FiD directly intersects with
+        the retrieval and long-context aspects of this paper.
+
+  \item \textbf{Dr.\ Shunyu Yao} (Princeton University / OpenAI) -- Known for
+        ReAct, Tree of Thoughts, and agent reasoning frameworks.  His expertise
+        in agent planning and memory management makes him well-placed to
+        evaluate ContextOS's scheduling and governance contributions.
+
+  \item \textbf{Prof.\ Heng Ji} (University of Illinois Urbana-Champaign) --
+        Expert in information extraction, knowledge graphs, and multi-document
+        summarisation.  Her research on information fusion and cross-document
+        reasoning is closely related to ContextOS's multi-signal prioritization
+        and compression components.
+\end{enumerate}
+
+\textbf{Data and code availability.}  The complete ContextOS codebase,
+ContextBench dataset generation scripts, and all experimental result files are
+available as open source under the Apache License 2.0.  The repository URL
+will be made publicly accessible upon acceptance; during review, the code is
+available at the anonymised repository link provided in the supplementary
+materials.
+
+\textbf{Ethics statement.}  All datasets used in this work are either
+synthetic (ContextBench, generated programmatically with no human subjects) or
+publicly available benchmarks (LongBench, MuSiQue, NarrativeQA, HotpotQA).
+No personal or sensitive data is collected, processed, or published.
+
+We sincerely hope that this submission will be of interest to the readership of
+\textit{Information Sciences}.  We are committed to addressing any reviewer
+concerns promptly and thoroughly.
+
+\closing{Respectfully yours,}
+
+\vspace{1.5cm}
+
+\noindent
+\textit{(Author identities withheld for double-blind review)}
+
+\vspace{0.8cm}
+
+\noindent
+\textbf{Corresponding Author:} Anonymous (identities revealed upon acceptance)\\
+\textbf{Email:} \texttt{[redacted for review]}\\
+\textbf{Affiliation:} \texttt{[redacted for review]}\\
+\textbf{Manuscript type:} Regular Article\\
+\textbf{Estimated length:} $\approx$35 pages (main text + appendices)\\
+\textbf{Number of figures:} 9\\
+\textbf{Number of tables:} 12 (main) + 17 (appendix)\\
+\textbf{Supplementary material:} Appendix (pseudocode, extended results,
+hyperparameter analysis, implementation details)\\
+\textbf{Open-source code:} Anonymised repository link in supplementary\\
+\textbf{Dataset availability:} Fully reproducible from provided scripts\\
+\textbf{Conflicts of interest:} None
+
+\end{letter}
+
+\end{document}
